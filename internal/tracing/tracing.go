@@ -3,7 +3,7 @@ package tracing
 import (
 	"context"
 
-	"github.com/henrywhitaker3/go-template/internal/app"
+	"github.com/henrywhitaker3/go-template/internal/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -16,16 +16,21 @@ import (
 )
 
 var (
-	Tracer = otel.Tracer("api")
+	name           = "not set"
+	TracerProvider *trace.TracerProvider
 )
 
-func InitTracer(app *app.App) (*trace.TracerProvider, error) {
+func InitTracer(conf *config.Config, version string) (*trace.TracerProvider, error) {
+	name = conf.Telemetry.Tracing.ServiceName
 	var exporter trace.SpanExporter
 	var err error
-	if app.Config.Telemetry.Tracing.Endpoint == "stdout" {
+	if conf.Telemetry.Tracing.Endpoint == "stdout" {
 		exporter, err = stdout.New(stdout.WithPrettyPrint())
 	} else {
-		exporter, err = otlptracehttp.New(context.Background(), otlptracehttp.WithEndpointURL(app.Config.Telemetry.Tracing.Endpoint))
+		exporter, err = otlptracehttp.New(
+			context.Background(),
+			otlptracehttp.WithEndpointURL(conf.Telemetry.Tracing.Endpoint),
+		)
 	}
 	if err != nil {
 		return nil, err
@@ -40,9 +45,9 @@ func InitTracer(app *app.App) (*trace.TracerProvider, error) {
 		resource.WithTelemetrySDK(),
 		resource.WithFromEnv(),
 		resource.WithAttributes(
-			semconv.ServiceName("api"),
-			semconv.ServiceVersion(app.Version),
-			attribute.String("environment", app.Config.Environment),
+			semconv.ServiceName(name),
+			semconv.ServiceVersion(version),
+			attribute.String("environment", conf.Environment),
 		),
 	)
 	if err != nil {
@@ -50,17 +55,22 @@ func InitTracer(app *app.App) (*trace.TracerProvider, error) {
 	}
 
 	tp := trace.NewTracerProvider(
-		trace.WithSampler(trace.TraceIDRatioBased(app.Config.Telemetry.Tracing.SampleRate)),
+		trace.WithSampler(trace.TraceIDRatioBased(conf.Telemetry.Tracing.SampleRate)),
 		trace.WithBatcher(exporter),
 		trace.WithResource(res),
 	)
+	TracerProvider = tp
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	otel.SetTracerProvider(tp)
 	return tp, nil
 }
 
 func NewSpan(ctx context.Context, name string, opts ...otrace.SpanStartOption) (context.Context, otrace.Span) {
-	return Tracer.Start(ctx, name, opts...)
+	if TracerProvider == nil {
+		return otel.Tracer(name).Start(ctx, name, opts...)
+	}
+	return TracerProvider.Tracer(name).Start(ctx, name, opts...)
 }
 
 func AddString(ctx context.Context, key, value string) {

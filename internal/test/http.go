@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,13 +26,18 @@ func Get(app *app.App, url string, apikey string) *httptest.ResponseRecorder {
 }
 
 func Post(t *testing.T, app *app.App, url string, body any, apikey string) *httptest.ResponseRecorder {
-	by, err := json.Marshal(body)
-	require.Nil(t, err)
+	var reader io.Reader
+	if body != nil {
+		by, err := json.Marshal(body)
+		require.Nil(t, err)
+		reader = bytes.NewReader(by)
+	}
 
-	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(by))
+	req := httptest.NewRequest(http.MethodPost, url, reader)
 	if apikey != "" {
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", apikey))
 	}
+	req.Header.Set("Content-type", echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	app.Http.ServeHTTP(rec, req)
 
@@ -39,13 +45,18 @@ func Post(t *testing.T, app *app.App, url string, body any, apikey string) *http
 }
 
 func Patch(t *testing.T, app *app.App, url string, body any, apikey string) *httptest.ResponseRecorder {
-	by, err := json.Marshal(body)
-	require.Nil(t, err)
+	var reader io.Reader
+	if body != nil {
+		by, err := json.Marshal(body)
+		require.Nil(t, err)
+		reader = bytes.NewReader(by)
+	}
 
-	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(by))
+	req := httptest.NewRequest(http.MethodPatch, url, reader)
 	if apikey != "" {
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", apikey))
 	}
+	req.Header.Set("Content-type", echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	app.Http.ServeHTTP(rec, req)
 
@@ -53,13 +64,18 @@ func Patch(t *testing.T, app *app.App, url string, body any, apikey string) *htt
 }
 
 func Delete(t *testing.T, app *app.App, url string, body any, apikey string) *httptest.ResponseRecorder {
-	by, err := json.Marshal(body)
-	require.Nil(t, err)
+	var reader io.Reader
+	if body != nil {
+		by, err := json.Marshal(body)
+		require.Nil(t, err)
+		reader = bytes.NewReader(by)
+	}
 
-	req := httptest.NewRequest(http.MethodDelete, url, bytes.NewReader(by))
+	req := httptest.NewRequest(http.MethodDelete, url, reader)
 	if apikey != "" {
 		req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", apikey))
 	}
+	req.Header.Set("Content-type", echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	app.Http.ServeHTTP(rec, req)
 
