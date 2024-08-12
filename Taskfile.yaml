@@ -22,6 +22,11 @@ tasks:
       - task: up
       - go test ./...
 
+  build:
+    desc: Build the docker image
+    cmds:
+      - docker build . -f Dockerfile
+
   migrate:new:
     desc: Create a new migration from the initial schema
     dir: database
