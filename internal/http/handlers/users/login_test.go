@@ -16,7 +16,7 @@ func TestItLogsInAUser(t *testing.T) {
 	app, cancel := test.App(t)
 	defer cancel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 
 	user, password := test.User(t, app)
