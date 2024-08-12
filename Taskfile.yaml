@@ -1,0 +1,46 @@
+version: 3
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task -l
+
+  down:
+    desc: Stop the docker containers
+    cmds:
+      - docker compose down
+
+  up:
+    desc: Stand up the docker containers
+    cmds:
+      - docker compose up -d redis postgres
+
+  test:unit:
+    desc: Run the unit tests
+    cmds:
+      - task: up
+      - go test ./...
+
+  migrate:new:
+    desc: Create a new migration from the initial schema
+    dir: database
+    cmds:
+      - rm database/migrations/files/.gitkeep || true
+      - atlas migrate diff {{ .CLI_ARGS }} --env {{ .ENV | default "postgres" }}
+
+  migrate:fmt:
+    desc: Format the atlas schema
+    dir: database
+    cmds:
+      - atlas schema fmt
+
+  migrate:up:
+    desc: Run the up migrations
+    cmds:
+      - go run main.go migrate up
+
+  migrate:down:
+    desc: Run the down migrations
+    cmds:
+      - go run main.go migrate down

@@ -1,0 +1,11 @@
+log_level: debug
+
+database:
+  url: postgres://api:password@127.0.0.1:5432/api?sslmode=disable
+
+redis:
+  addr: 127.0.0.1:6379
+
+tracing:
+  enabled: false
+  endpoint: ""

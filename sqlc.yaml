@@ -1,0 +1,12 @@
+version: "2"
+
+sql:
+  - engine: postgresql
+    queries: database/queries
+    schema: database/migrations/files
+    gen:
+      go:
+        package: queries
+        out: database/queries
+        emit_result_struct_pointers: true
+        sql_driver: "pgx/v5"
