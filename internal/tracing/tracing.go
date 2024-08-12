@@ -18,7 +18,6 @@ import (
 var (
 	name           = "not set"
 	TracerProvider *trace.TracerProvider
-	Tracer         otrace.Tracer
 )
 
 func InitTracer(conf *config.Config, version string) (*trace.TracerProvider, error) {
@@ -64,15 +63,14 @@ func InitTracer(conf *config.Config, version string) (*trace.TracerProvider, err
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	otel.SetTracerProvider(tp)
-	Tracer = tp.Tracer(name)
 	return tp, nil
 }
 
 func NewSpan(ctx context.Context, name string, opts ...otrace.SpanStartOption) (context.Context, otrace.Span) {
-	if Tracer == nil {
+	if TracerProvider == nil {
 		return otel.Tracer(name).Start(ctx, name, opts...)
 	}
-	return Tracer.Start(ctx, name, opts...)
+	return TracerProvider.Tracer(name).Start(ctx, name, opts...)
 }
 
 func AddString(ctx context.Context, key, value string) {

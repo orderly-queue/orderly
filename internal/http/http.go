@@ -29,10 +29,10 @@ func New(app *app.App) *Http {
 	e.HidePort = true
 
 	e.Use(mw.RequestID())
-	e.Use(middleware.User(app))
 	if app.Config.Telemetry.Tracing.Enabled {
 		e.Use(middleware.Tracing(app.Config.Telemetry.Tracing))
 	}
+	e.Use(middleware.User(app))
 	if app.Config.Telemetry.Sentry.Enabled {
 		e.Use(sentryecho.New(sentryecho.Options{
 			Repanic: true,

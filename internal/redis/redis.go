@@ -1,25 +1,26 @@
 package redis
 
 import (
+	"strings"
+
 	"github.com/henrywhitaker3/go-template/internal/config"
-	"github.com/henrywhitaker3/go-template/internal/tracing"
 	"github.com/redis/rueidis"
 	"github.com/redis/rueidis/rueidisotel"
 )
 
 func New(conf *config.Config) (rueidis.Client, error) {
-	var client rueidis.Client
-	var err error
 	opts := rueidis.ClientOption{
 		InitAddress:   []string{conf.Redis.Addr},
 		Password:      conf.Redis.Password,
 		MaxFlushDelay: conf.Redis.MaxFlushDelay,
 	}
+
+	var client rueidis.Client
+	var err error
 	if conf.Telemetry.Tracing.Enabled {
-		// TODO: fix spans not being connected to request span
-		client, err = rueidisotel.NewClient(
-			opts, rueidisotel.WithTracerProvider(tracing.TracerProvider),
-		)
+		client, err = rueidisotel.NewClient(opts, rueidisotel.WithDBStatement(func(cmdTokens []string) string {
+			return strings.Join(cmdTokens, " ")
+		}))
 	} else {
 		client, err = rueidis.NewClient(opts)
 	}
