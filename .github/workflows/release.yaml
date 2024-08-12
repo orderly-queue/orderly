@@ -25,7 +25,7 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/henrywhitaker3/api:latest
-            ghcr.io/henrywhitaker3/api:${{ github.ref_name }}
+            ghcr.io/henrywhitaker3/go-template:latest
+            ghcr.io/henrywhitaker3/go-template:${{ github.ref_name }}
           build-args: |
             VERSION=${{ github.ref_name }}
