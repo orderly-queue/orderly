@@ -10,13 +10,16 @@ A template repo for golang APIs, comes with:
 - HTTP server
 - Test containers setup
 - SQLC
+- OpenTelemetry Tracing
+- Sentry error tracking
+- User creation/JWT authentication
 
 ## Get Started
 
 First, create a new repo from the template, then run:
 
 ```
-task rename
+./hack/rename.sh
 ```
 
 and follow the promts to rename the go module etc.
@@ -26,7 +29,6 @@ and follow the promts to rename the go module etc.
 On every PR, the Dockerfile will be built and unit tests will be run, you can run these manually with:
 
 ```
-# Builds the docker image
 task build
 ```
 
