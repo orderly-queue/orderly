@@ -31,6 +31,9 @@ func Logger() echo.MiddlewareFunc {
 			if id := common.RequestID(c); id != "" {
 				logger = logger.With("request_id", id)
 			}
+			if trace := common.TraceID(c.Request().Context()); trace != "" {
+				logger = logger.With("trace_id", trace)
+			}
 			if err != nil {
 				c.Error(err)
 				logger = logger.With("error", err.Error())

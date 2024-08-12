@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	ctxIdKey = "request_id"
+	ctxIdKey   = "request_id"
+	traceIdKey = "trace_id"
 )
 
 func RequestID(c echo.Context) string {
@@ -24,6 +25,14 @@ func SetContextID(ctx context.Context, id string) context.Context {
 
 func ContextID(ctx context.Context) string {
 	return ctxgen.Value[string](ctx, ctxIdKey)
+}
+
+func SetTraceID(ctx context.Context, id string) context.Context {
+	return ctxgen.WithValue(ctx, traceIdKey, id)
+}
+
+func TraceID(ctx context.Context) string {
+	return ctxgen.Value[string](ctx, traceIdKey)
 }
 
 func SetRequest[T any](ctx context.Context, req T) context.Context {
