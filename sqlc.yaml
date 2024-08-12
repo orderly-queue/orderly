@@ -9,4 +9,9 @@ sql:
         package: queries
         out: database/queries
         emit_result_struct_pointers: true
-        sql_driver: "pgx/v5"
+        # sql_package: "pgx/v5"
+        # overrides:
+        #   - db_type: "uuid"
+        #     go_type:
+        #       import: "github.com/google/uuid"
+        #       type: "UUID"

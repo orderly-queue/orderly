@@ -13,6 +13,8 @@ import (
 	"github.com/henrywhitaker3/go-template/internal/config"
 	"github.com/henrywhitaker3/go-template/internal/http"
 	"github.com/henrywhitaker3/go-template/internal/logger"
+	pg "github.com/henrywhitaker3/go-template/internal/postgres"
+	"github.com/henrywhitaker3/go-template/internal/users"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -82,9 +84,28 @@ func App(t *testing.T) (*app.App, context.CancelFunc) {
 
 	app.Http = http.New(app)
 
+	mig, err := pg.NewMigrator(app.Database)
+	require.Nil(t, err)
+
+	require.Nil(t, mig.Up())
+
 	return app, func() {
 		require.Nil(t, redisCont.Terminate(ctx))
 		require.Nil(t, pgCont.Terminate(ctx))
 		cancel()
 	}
+}
+
+func User(t *testing.T, app *app.App) (*users.User, string) {
+	require.NotNil(t, app)
+
+	password := Sentence(5)
+
+	user, err := app.Users.CreateUser(context.Background(), users.CreateParams{
+		Name:     Word(),
+		Email:    Email(),
+		Password: password,
+	})
+	require.Nil(t, err)
+	return user, password
 }

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/henrywhitaker3/go-template/cmd/root"
 	"github.com/henrywhitaker3/go-template/internal/app"
 	"github.com/henrywhitaker3/go-template/internal/config"
@@ -43,6 +44,27 @@ func main() {
 	}()
 
 	logger.Wrap(ctx, conf.LogLevel.Level())
+	logger := logger.Logger(ctx)
+
+	if conf.Telemetry.Tracing.Enabled {
+		logger.Infow("otel tracing enabled", "service_name", conf.Telemetry.Tracing.ServiceName)
+		tracer, err := tracing.InitTracer(conf, version)
+		if err != nil {
+			die(err)
+		}
+		defer tracer.Shutdown(context.Background())
+	}
+	if conf.Telemetry.Sentry.Enabled {
+		logger.Info("sentry enabled")
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:           conf.Telemetry.Sentry.Dsn,
+			Environment:   conf.Environment,
+			Release:       version,
+			EnableTracing: false,
+		}); err != nil {
+			die(err)
+		}
+	}
 
 	app, err := app.New(ctx, conf)
 	if err != nil {
@@ -50,12 +72,6 @@ func main() {
 	}
 	app.Version = version
 	app.Http = http.New(app)
-
-	if conf.Telemetry.Tracing.Enabled {
-		if _, err := tracing.InitTracer(app); err != nil {
-			die(err)
-		}
-	}
 
 	root := root.New(app)
 	root.SetContext(ctx)

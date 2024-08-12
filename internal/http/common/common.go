@@ -2,8 +2,11 @@ package common
 
 import (
 	"context"
+	"net/http"
+	"strings"
 
 	"github.com/henrywhitaker3/ctxgen"
+	"github.com/henrywhitaker3/go-template/internal/users"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,4 +32,21 @@ func SetRequest[T any](ctx context.Context, req T) context.Context {
 
 func GetRequest[T any](ctx context.Context) (T, bool) {
 	return ctxgen.ValueOk[T](ctx, "request")
+}
+
+func SetUser(ctx context.Context, user *users.User) context.Context {
+	return ctxgen.WithValue(ctx, "user", user)
+}
+
+func GetUser(ctx context.Context) (*users.User, bool) {
+	return ctxgen.ValueOk[*users.User](ctx, "user")
+}
+
+func GetToken(req *http.Request) string {
+	header := req.Header.Get(echo.HeaderAuthorization)
+	if header != "" {
+		header = strings.Replace(header, "Bearer ", "", 1)
+		return header
+	}
+	return ""
 }

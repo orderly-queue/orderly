@@ -35,9 +35,10 @@ type Redis struct {
 }
 
 type Tracing struct {
-	Enabled    bool    `yaml:"enabled"`
-	SampleRate float64 `yaml:"sample_rate"`
-	Endpoint   string  `yaml:"endpoint"`
+	ServiceName string  `yaml:"service_name"`
+	Enabled     bool    `yaml:"enabled"`
+	SampleRate  float64 `yaml:"sample_rate"`
+	Endpoint    string  `yaml:"endpoint"`
 }
 
 type Metrics struct {
@@ -45,9 +46,15 @@ type Metrics struct {
 	Port    int  `yaml:"port"`
 }
 
+type Sentry struct {
+	Enabled bool   `yaml:"enabled"`
+	Dsn     string `yaml:"dsn"`
+}
+
 type Telemetry struct {
 	Tracing Tracing `yaml:"tracing"`
 	Metrics Metrics `yaml:"metrics"`
+	Sentry  Sentry  `yaml:"sentry"`
 }
 
 type Probes struct {
@@ -59,7 +66,9 @@ type Http struct {
 }
 
 type Config struct {
+	Name        string   `yaml:"name"`
 	Environment string   `yaml:"env"`
+	JwtSecret   string   `yaml:"jwt_secret"`
 	LogLevel    LogLevel `yaml:"log_level"`
 	Database    Postgres `yaml:"database"`
 	Redis       Redis    `yaml:"redis"`
@@ -96,6 +105,15 @@ func (c *Config) validate() error {
 	if c.Redis.Addr == "" {
 		return errors.New("invalid redis addr")
 	}
+	if c.Name == "" {
+		return errors.New("name must be set")
+	}
+	if c.JwtSecret == "" {
+		return errors.New("jwt_secret must be set")
+	}
+	if c.Telemetry.Sentry.Enabled && c.Telemetry.Sentry.Dsn == "" {
+		return errors.New("sentry dsn must be set when enabled")
+	}
 	return nil
 }
 
@@ -114,5 +132,8 @@ func (c *Config) setDefaults() {
 	}
 	if c.Probes.Port == 0 {
 		c.Probes.Port = 8767
+	}
+	if c.Telemetry.Tracing.ServiceName == "" {
+		c.Telemetry.Tracing.ServiceName = c.Name
 	}
 }

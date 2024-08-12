@@ -1,4 +1,8 @@
+name: go-template
+
 log_level: debug
+
+jwt_secret: base64:5+TURHvxpBcP3umVlsqf4X3OODH9Ltdmyc+90tZLevkwmLAhEWgHs+C2B8NY6I9f44LcfmQGECS0n4Bpt2A90w==
 
 database:
   url: postgres://api:password@127.0.0.1:5432/api?sslmode=disable
@@ -6,6 +10,15 @@ database:
 redis:
   addr: 127.0.0.1:6379
 
-tracing:
-  enabled: false
-  endpoint: ""
+telemetry:
+  metrics:
+    enabled: true
+
+  sentry:
+    enabled: false
+    dsn: ""
+
+  tracing:
+    enabled: false
+    endpoint: ""
+    sample_rate: 1.0

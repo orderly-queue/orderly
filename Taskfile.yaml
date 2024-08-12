@@ -19,7 +19,6 @@ tasks:
   test:unit:
     desc: Run the unit tests
     cmds:
-      - task: up
       - go test ./...
 
   build:
@@ -27,11 +26,16 @@ tasks:
     cmds:
       - docker build . -f Dockerfile
 
+  serve:
+    desc: Run the api
+    cmds:
+      - go run main.go serve
+
   migrate:new:
     desc: Create a new migration from the initial schema
     dir: database
     cmds:
-      - rm database/migrations/files/.gitkeep || true
+      - rm migrations/files/.gitkeep || true
       - atlas migrate diff {{ .CLI_ARGS }} --env {{ .ENV | default "postgres" }}
 
   migrate:fmt:
@@ -49,3 +53,11 @@ tasks:
     desc: Run the down migrations
     cmds:
       - go run main.go migrate down
+
+  jwt:secret:
+    desc: Generate a JWT sercet
+    silent: true
+    cmds:
+      - |
+        rand=$(openssl rand 64 | base64 -w 0)
+        echo "base64:$rand"
