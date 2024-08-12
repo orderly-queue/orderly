@@ -27,6 +27,21 @@ jobs:
           build-args: |
             VERSION=${{ github.ref_name }}
 
+  commitlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wagoid/commitlint-github-action@v6
+
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: wagoid/commitlint-github-action@v6
+
   # chart:
   #   runs-on: ubuntu-latest
   #   strategy:
