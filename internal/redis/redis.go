@@ -16,6 +16,7 @@ func New(conf *config.Config) (rueidis.Client, error) {
 		MaxFlushDelay: conf.Redis.MaxFlushDelay,
 	}
 	if conf.Telemetry.Tracing.Enabled {
+		// TODO: fix spans not being connected to request span
 		client, err = rueidisotel.NewClient(
 			opts, rueidisotel.WithTracerProvider(tracing.TracerProvider),
 		)

@@ -11,9 +11,9 @@ import (
 	"github.com/henrywhitaker3/go-template/internal/metrics"
 	"github.com/henrywhitaker3/go-template/internal/postgres"
 	"github.com/henrywhitaker3/go-template/internal/probes"
+	"github.com/henrywhitaker3/go-template/internal/redis"
 	"github.com/henrywhitaker3/go-template/internal/users"
 	"github.com/redis/rueidis"
-	"github.com/redis/rueidis/rueidisotel"
 )
 
 type server interface {
@@ -42,18 +42,7 @@ type App struct {
 }
 
 func New(ctx context.Context, conf *config.Config) (*App, error) {
-	var redis rueidis.Client
-	var err error
-	opts := rueidis.ClientOption{
-		InitAddress:   []string{conf.Redis.Addr},
-		Password:      conf.Redis.Password,
-		MaxFlushDelay: conf.Redis.MaxFlushDelay,
-	}
-	if conf.Telemetry.Tracing.Enabled {
-		redis, err = rueidisotel.NewClient(opts)
-	} else {
-		redis, err = rueidis.NewClient(opts)
-	}
+	redis, err := redis.New(conf)
 	if err != nil {
 		return nil, err
 	}
