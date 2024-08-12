@@ -52,7 +52,9 @@ func main() {
 	app.Http = http.New(app)
 
 	if conf.Telemetry.Tracing.Enabled {
-		tracing.InitTracer(app)
+		if _, err := tracing.InitTracer(app); err != nil {
+			die(err)
+		}
 	}
 
 	root := root.New(app)
