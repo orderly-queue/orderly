@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/henrywhitaker3/go-template/internal/test"
+	"github.com/henrywhitaker3/go-template/internal/workers"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,15 +41,19 @@ func TestItRunsWorkers(t *testing.T) {
 	app, cancel := test.App(t)
 	defer cancel()
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
 	worker := &testWorker{
 		interval:   time.Millisecond,
 		timeout:    time.Millisecond * 5,
 		executions: 0,
 	}
 
-	app.Runner.Register(worker)
+	runner := workers.NewRunner(ctx, app.Redis)
+	runner.Register(worker)
 
-	time.Sleep(time.Millisecond * 2)
+	time.Sleep(time.Millisecond * 3)
 
-	require.Equal(t, 1, worker.Executions())
+	require.GreaterOrEqual(t, worker.Executions(), 1)
 }

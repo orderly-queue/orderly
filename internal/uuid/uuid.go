@@ -49,3 +49,8 @@ func Must(id UUID, err error) UUID {
 	}
 	return id
 }
+
+func Parse(s string) (UUID, error) {
+	id, err := uuid.Parse(s)
+	return UUID(id), err
+}
