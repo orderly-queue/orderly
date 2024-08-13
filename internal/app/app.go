@@ -14,6 +14,7 @@ import (
 	"github.com/henrywhitaker3/go-template/internal/probes"
 	"github.com/henrywhitaker3/go-template/internal/redis"
 	"github.com/henrywhitaker3/go-template/internal/users"
+	"github.com/henrywhitaker3/go-template/internal/workers"
 	"github.com/redis/rueidis"
 )
 
@@ -32,6 +33,8 @@ type App struct {
 
 	Probes  *probes.Probes
 	Metrics *metrics.Metrics
+
+	Runner *workers.Runner
 
 	Users *users.Users
 
@@ -74,6 +77,8 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 
 		Probes:  probes.New(conf.Probes.Port),
 		Metrics: metrics.New(conf.Telemetry.Metrics.Port),
+
+		Runner: workers.NewRunner(ctx, redis),
 	}
 
 	return app, nil

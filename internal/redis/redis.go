@@ -1,11 +1,19 @@
 package redis
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/henrywhitaker3/go-template/internal/config"
 	"github.com/redis/rueidis"
 	"github.com/redis/rueidis/rueidisotel"
+)
+
+var (
+	ErrLocked = errors.New("key already locked")
 )
 
 func New(conf *config.Config) (rueidis.Client, error) {
@@ -26,4 +34,21 @@ func New(conf *config.Config) (rueidis.Client, error) {
 	}
 
 	return client, err
+}
+
+func Lock(ctx context.Context, client rueidis.Client, key string, exp time.Duration) error {
+	cmd := client.B().Set().Key(fmt.Sprintf("locks:%s", key)).Value("true").Nx().Px(exp).Build()
+	res := client.Do(ctx, cmd)
+	if err := res.Error(); err != nil {
+		if errors.Is(err, rueidis.Nil) {
+			return ErrLocked
+		}
+		return err
+	}
+	return nil
+}
+
+func Unlock(ctx context.Context, client rueidis.Client, key string) error {
+	cmd := client.B().Del().Key(fmt.Sprintf("locks:%s", key)).Build()
+	return client.Do(ctx, cmd).Error()
 }

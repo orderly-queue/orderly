@@ -13,6 +13,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var (
+	WorkerExecutions = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "worker_executions_count",
+		Help: "The number of worker executions completed",
+	}, []string{"name"})
+	WorkerExecutionErrors = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "worker_execution_errors_count",
+		Help: "The number of worker execution errors",
+	}, []string{"name"})
+)
+
 type Metrics struct {
 	e *echo.Echo
 
@@ -34,7 +45,10 @@ func New(port int) *Metrics {
 		reg:      &sync.Once{},
 	}
 
-	m.reg.Do(func() {})
+	m.reg.Do(func() {
+		m.registry.MustRegister(WorkerExecutions)
+		m.registry.MustRegister(WorkerExecutionErrors)
+	})
 
 	m.e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{
 		Gatherer: m.registry,
