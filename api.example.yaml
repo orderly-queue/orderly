@@ -2,7 +2,8 @@ name: go-template
 
 log_level: debug
 
-jwt_secret: base64:5+TURHvxpBcP3umVlsqf4X3OODH9Ltdmyc+90tZLevkwmLAhEWgHs+C2B8NY6I9f44LcfmQGECS0n4Bpt2A90w==
+jwt_secret: base64:Hznayfuih4eLnZjtNGiwauq0y999FhJWKA8zGwymaoQ
+encryption_key: base64:32:eoN9P1NndyYjKoeIyoaKxmaVzYCz32ZEc9V0XmXlFM4=
 
 database:
   url: postgres://api:password@127.0.0.1:5432/api?sslmode=disable

@@ -7,6 +7,7 @@ import (
 
 	"github.com/henrywhitaker3/go-template/database/queries"
 	"github.com/henrywhitaker3/go-template/internal/config"
+	"github.com/henrywhitaker3/go-template/internal/crypto"
 	"github.com/henrywhitaker3/go-template/internal/jwt"
 	"github.com/henrywhitaker3/go-template/internal/metrics"
 	"github.com/henrywhitaker3/go-template/internal/postgres"
@@ -34,7 +35,8 @@ type App struct {
 
 	Users *users.Users
 
-	Jwt *jwt.Jwt
+	Jwt        *jwt.Jwt
+	Encryption *crypto.Encrptor
 
 	Database *sql.DB
 	Queries  *queries.Queries
@@ -53,6 +55,11 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 	}
 	queries := queries.New(db)
 
+	enc, err := crypto.NewEncryptor(conf.EncryptionKey)
+	if err != nil {
+		return nil, err
+	}
+
 	app := &App{
 		Config: conf,
 
@@ -62,7 +69,8 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 
 		Users: users.New(queries),
 
-		Jwt: jwt.New(conf.JwtSecret, redis),
+		Encryption: enc,
+		Jwt:        jwt.New(conf.JwtSecret, redis),
 
 		Probes:  probes.New(conf.Probes.Port),
 		Metrics: metrics.New(conf.Telemetry.Metrics.Port),

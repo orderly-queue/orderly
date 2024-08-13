@@ -10,6 +10,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/henrywhitaker3/go-template/cmd/root"
+	"github.com/henrywhitaker3/go-template/cmd/secrets"
 	"github.com/henrywhitaker3/go-template/internal/app"
 	"github.com/henrywhitaker3/go-template/internal/config"
 	"github.com/henrywhitaker3/go-template/internal/http"
@@ -22,6 +23,15 @@ var (
 )
 
 func main() {
+	// Secret generation utlities that dont need config/app
+	if len(os.Args) > 1 && os.Args[1] == "secrets" {
+		os.Args = append(os.Args[:1], os.Args[2:]...)
+		if err := secrets.New().Execute(); err != nil {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	conf, err := config.Load(getConfigPath())
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {

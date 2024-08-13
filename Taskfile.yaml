@@ -58,6 +58,10 @@ tasks:
     desc: Generate a JWT sercet
     silent: true
     cmds:
-      - |
-        rand=$(openssl rand 64 | base64 -w 0)
-        echo "base64:$rand"
+      - go run main.go secrets jwt
+
+  encryption:key:
+    desc: Generate a JWT sercet
+    silent: true
+    cmds:
+      - go run main.go secrets key
