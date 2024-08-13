@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(id, name, email, password)
 VALUES ($1, $2, $3, $4)
-RETURNING id, name, email, password, created_at, updated_at, deleted_at
+RETURNING id, name, email, password, admin, created_at, updated_at, deleted_at
 `
 
 type CreateUserParams struct {
@@ -37,6 +37,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, 
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.Admin,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -56,7 +57,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password, created_at, updated_at, deleted_at
+SELECT id, name, email, password, admin, created_at, updated_at, deleted_at
 FROM users
 WHERE email = $1
 LIMIT 1
@@ -70,6 +71,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*User, erro
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.Admin,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -78,7 +80,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (*User, erro
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, name, email, password, created_at, updated_at, deleted_at
+SELECT id, name, email, password, admin, created_at, updated_at, deleted_at
 FROM users
 WHERE id = $1
 LIMIT 1
@@ -92,6 +94,53 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (*User, error) 
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.Admin,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
+const makeAdmin = `-- name: MakeAdmin :one
+UPDATE users
+SET admin = true
+WHERE id = $1
+RETURNING id, name, email, password, admin, created_at, updated_at, deleted_at
+`
+
+func (q *Queries) MakeAdmin(ctx context.Context, id uuid.UUID) (*User, error) {
+	row := q.db.QueryRowContext(ctx, makeAdmin, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.Admin,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
+const removeAdmin = `-- name: RemoveAdmin :one
+UPDATE users
+SET admin = false
+WHERE id = $1
+RETURNING id, name, email, password, admin, created_at, updated_at, deleted_at
+`
+
+func (q *Queries) RemoveAdmin(ctx context.Context, id uuid.UUID) (*User, error) {
+	row := q.db.QueryRowContext(ctx, removeAdmin, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.Admin,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,

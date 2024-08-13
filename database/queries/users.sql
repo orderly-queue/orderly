@@ -19,3 +19,15 @@ RETURNING *;
 UPDATE users
 SET deleted_at = EXTRACT(epoch FROM NOW())
 WHERE id = $1;
+
+-- name: MakeAdmin :one
+UPDATE users
+SET admin = true
+WHERE id = $1
+RETURNING *;
+
+-- name: RemoveAdmin :one
+UPDATE users
+SET admin = false
+WHERE id = $1
+RETURNING *;

@@ -15,6 +15,7 @@ type User struct {
 	Name      string
 	Email     string
 	Password  string
+	Admin     bool
 	CreatedAt int64
 	UpdatedAt int64
 	DeletedAt sql.NullInt64

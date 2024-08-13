@@ -53,6 +53,8 @@ func New(app *app.App) *Http {
 	h.Register(users.NewLogout(app))
 	h.Register(users.NewRegister(app))
 	h.Register(users.NewMe(app))
+	h.Register(users.NewMakeAdmin(app))
+	h.Register(users.NewRemoveAdmin(app))
 
 	return h
 }

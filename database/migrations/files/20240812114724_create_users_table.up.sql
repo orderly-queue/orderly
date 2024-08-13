@@ -4,6 +4,7 @@ CREATE TABLE "public"."users" (
   "name" text NOT NULL,
   "email" text NOT NULL,
   "password" text NOT NULL,
+  "admin" boolean NOT NULL DEFAULT false,
   "created_at" bigint NOT NULL DEFAULT EXTRACT(epoch FROM now()),
   "updated_at" bigint NOT NULL DEFAULT EXTRACT(epoch FROM now()),
   "deleted_at" bigint NULL,
