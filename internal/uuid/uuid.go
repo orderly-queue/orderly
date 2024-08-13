@@ -54,3 +54,11 @@ func Parse(s string) (UUID, error) {
 	id, err := uuid.Parse(s)
 	return UUID(id), err
 }
+
+func Map(ids []UUID) []uuid.UUID {
+	out := []uuid.UUID{}
+	for _, id := range ids {
+		out = append(out, id.UUID())
+	}
+	return out
+}

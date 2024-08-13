@@ -45,15 +45,15 @@ func TestItRunsWorkers(t *testing.T) {
 	defer cancel()
 
 	worker := &testWorker{
-		interval:   time.Millisecond,
-		timeout:    time.Millisecond * 5,
+		interval:   time.Millisecond * 5,
+		timeout:    time.Millisecond * 10,
 		executions: 0,
 	}
 
 	runner := workers.NewRunner(ctx, app.Redis)
 	runner.Register(worker)
 
-	time.Sleep(time.Millisecond * 3)
+	time.Sleep(time.Millisecond * 9)
 
-	require.GreaterOrEqual(t, worker.Executions(), 1)
+	require.Equal(t, 1, worker.Executions())
 }
