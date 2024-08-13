@@ -36,7 +36,9 @@ func Logger() echo.MiddlewareFunc {
 			}
 			if err != nil {
 				c.Error(err)
-				logger = logger.With("error", err.Error())
+				if c.Response().Status >= 500 {
+					logger = logger.With("error", err.Error())
+				}
 			}
 			logger.Info("request")
 			return nil
