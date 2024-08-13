@@ -53,8 +53,8 @@ func (m *RemoveAdminHandler) Path() string {
 
 func (m *RemoveAdminHandler) Middleware() []echo.MiddlewareFunc {
 	return []echo.MiddlewareFunc{
-		middleware.Bind[AdminRequest](),
 		middleware.Authenticated(),
 		middleware.Admin(m.app),
+		middleware.Bind[AdminRequest](),
 	}
 }

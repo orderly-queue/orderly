@@ -62,8 +62,8 @@ func (m *MakeAdminHandler) Path() string {
 
 func (m *MakeAdminHandler) Middleware() []echo.MiddlewareFunc {
 	return []echo.MiddlewareFunc{
-		middleware.Bind[AdminRequest](),
 		middleware.Authenticated(),
 		middleware.Admin(m.app),
+		middleware.Bind[AdminRequest](),
 	}
 }

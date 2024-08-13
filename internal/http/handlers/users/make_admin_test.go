@@ -16,18 +16,18 @@ func TestItMakesUsersAdmin(t *testing.T) {
 	app, cancel := test.App(t)
 	defer cancel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
 	admin, _ := test.User(t, app)
 	require.Nil(t, app.Users.MakeAdmin(ctx, admin))
-	adminToken, err := app.Jwt.NewForUser(admin, time.Second)
+	adminToken, err := app.Jwt.NewForUser(admin, time.Second*20)
 	require.Nil(t, err)
 
 	user, _ := test.User(t, app)
 
 	badUser, _ := test.User(t, app)
-	badUserToken, err := app.Jwt.NewForUser(badUser, time.Second)
+	badUserToken, err := app.Jwt.NewForUser(badUser, time.Second*20)
 	require.Nil(t, err)
 
 	type testCase struct {
