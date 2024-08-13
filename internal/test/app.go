@@ -35,7 +35,7 @@ func init() {
 }
 
 func App(t *testing.T) (*app.App, context.CancelFunc) {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 
 	logger.Wrap(ctx, zap.NewAtomicLevelAt(zapcore.DebugLevel))
 	pgCont, err := postgres.Run(
