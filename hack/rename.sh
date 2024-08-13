@@ -4,6 +4,7 @@ printf 'What is the new github url? (e.g. github.com/henrywhitaker3/go-template)
 read repo
 
 repoName=$(echo $repo | sed -e "s/github.com\///g")
+baseName=$(echo $repoName | sed -e "s~.*/~~g")
 
 printf 'What is the name of your service? '
 read name
@@ -24,3 +25,10 @@ find . -name '*.go' -print0 | xargs -0 sed -i "s~github.com/henrywhitaker3/go-te
 sed -i "s~Go Template~$name~g" bruno/bruno.json
 # and the name in the example config file
 sed -i "s~go-template~$name~g" api.example.yaml
+
+# Now do the default config file location
+sed -i "s~api.yaml~$baseName.yaml~g" main.go
+sed -i "s~*go-template~*$baseName~g" internal/test/app.go
+sed -i "s~api.example.yaml~$baseName.example.yaml~g" internal/test/app.go
+mv api.example.yaml "$baseName.example.yaml"
+echo "$baseName.yaml" >> .gitignore
