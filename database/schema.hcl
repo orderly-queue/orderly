@@ -23,6 +23,11 @@ table "users" {
     null = false
   }
 
+  column "admin" {
+    type    = bool
+    default = false
+  }
+
   column "created_at" {
     type    = bigint
     null    = false

@@ -231,3 +231,29 @@ func TestItGetsUserByLogin(t *testing.T) {
 		})
 	}
 }
+
+func TestItMakesAUserAdmin(t *testing.T) {
+	app, cancel := test.App(t)
+	defer cancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	user, _ := test.User(t, app)
+
+	require.False(t, user.Admin)
+
+	require.Nil(t, app.Users.MakeAdmin(ctx, user))
+	require.True(t, user.Admin)
+
+	user, err := app.Users.Get(ctx, user.ID)
+	require.Nil(t, err)
+	require.True(t, user.Admin)
+
+	require.Nil(t, app.Users.RemoveAdmin(ctx, user))
+	require.False(t, user.Admin)
+
+	user, err = app.Users.Get(ctx, user.ID)
+	require.Nil(t, err)
+	require.False(t, user.Admin)
+}

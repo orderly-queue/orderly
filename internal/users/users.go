@@ -14,6 +14,7 @@ type User struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
+	Admin     bool      `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -23,6 +24,7 @@ func mapUser(u *queries.User) *User {
 		ID:        uuid.UUID(u.ID),
 		Email:     u.Email,
 		Name:      u.Name,
+		Admin:     u.Admin,
 		CreatedAt: time.Unix(u.CreatedAt, 0),
 		UpdatedAt: time.Unix(u.UpdatedAt, 0),
 	}
@@ -99,4 +101,22 @@ func (u *Users) Login(ctx context.Context, email, password string) (*User, error
 		return nil, err
 	}
 	return mapUser(user), nil
+}
+
+func (u *Users) MakeAdmin(ctx context.Context, user *User) error {
+	ud, err := u.q.MakeAdmin(ctx, user.ID.UUID())
+	if err != nil {
+		return err
+	}
+	*user = *mapUser(ud)
+	return nil
+}
+
+func (u *Users) RemoveAdmin(ctx context.Context, user *User) error {
+	ud, err := u.q.RemoveAdmin(ctx, user.ID.UUID())
+	if err != nil {
+		return err
+	}
+	*user = *mapUser(ud)
+	return nil
 }
