@@ -66,12 +66,15 @@ type Http struct {
 }
 
 type Config struct {
-	Name        string   `yaml:"name"`
-	Environment string   `yaml:"env"`
-	JwtSecret   string   `yaml:"jwt_secret"`
-	LogLevel    LogLevel `yaml:"log_level"`
-	Database    Postgres `yaml:"database"`
-	Redis       Redis    `yaml:"redis"`
+	Name        string `yaml:"name"`
+	Environment string `yaml:"env"`
+
+	EncryptionKey string `yaml:"encryption_key"`
+	JwtSecret     string `yaml:"jwt_secret"`
+
+	LogLevel LogLevel `yaml:"log_level"`
+	Database Postgres `yaml:"database"`
+	Redis    Redis    `yaml:"redis"`
 
 	Probes Probes `yaml:"probes"`
 	Http   Http   `yaml:"http"`
@@ -110,6 +113,9 @@ func (c *Config) validate() error {
 	}
 	if c.JwtSecret == "" {
 		return errors.New("jwt_secret must be set")
+	}
+	if c.EncryptionKey == "" {
+		return errors.New("encryption_key must be set")
 	}
 	if c.Telemetry.Sentry.Enabled && c.Telemetry.Sentry.Dsn == "" {
 		return errors.New("sentry dsn must be set when enabled")
