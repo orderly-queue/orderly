@@ -12,5 +12,6 @@ RUN CGO_ENABLED=0 go build -ldflags="-X main.version=${VERSION}" -a -o api main.
 FROM alpine:3.20.2
 
 COPY --from=gob /build/api /api
+VOLUME [ "/config" ]
 
 ENTRYPOINT [ "/api" ]

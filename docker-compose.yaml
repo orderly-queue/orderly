@@ -16,5 +16,17 @@ services:
     ports:
       - 6379:6379
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["/api", "--config", "/config/api.yaml"]
+    ports:
+      - 8765:8765
+      - 8766:8766
+      - 8767:8767
+    volumes:
+      - ./api.yaml:/config/api.yaml:ro
+
 volumes:
   postgres:
