@@ -16,12 +16,21 @@ import (
 
 var (
 	CommandSeconds = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "command_seconds",
+		Name: "orderly_command_seconds",
 		Help: "The duration of commands processed by the server",
 		Buckets: []float64{
-			toSeconds(time.Microsecond * 5), toSeconds(time.Microsecond * 10), toSeconds(time.Microsecond * 20),
-			toSeconds(time.Microsecond * 50), toSeconds(time.Microsecond * 100), toSeconds(time.Microsecond * 200),
-			toSeconds(time.Microsecond * 500), toSeconds(time.Millisecond),
+			toSeconds(time.Nanosecond * 5), toSeconds(time.Nanosecond * 10), toSeconds(time.Nanosecond * 20),
+			toSeconds(time.Nanosecond * 50), toSeconds(time.Nanosecond * 100), toSeconds(time.Nanosecond * 105),
+			toSeconds(time.Nanosecond * 110), toSeconds(time.Nanosecond * 112), toSeconds(time.Nanosecond * 114),
+			toSeconds(time.Nanosecond * 116), toSeconds(time.Nanosecond * 118), toSeconds(time.Nanosecond * 120),
+			toSeconds(time.Nanosecond * 121), toSeconds(time.Nanosecond * 122), toSeconds(time.Nanosecond * 123),
+			toSeconds(time.Nanosecond * 124), toSeconds(time.Nanosecond * 125), toSeconds(time.Nanosecond * 126),
+			toSeconds(time.Nanosecond * 127), toSeconds(time.Nanosecond * 128), toSeconds(time.Nanosecond * 129),
+			toSeconds(time.Nanosecond * 130), toSeconds(time.Nanosecond * 132), toSeconds(time.Nanosecond * 134),
+			toSeconds(time.Nanosecond * 136), toSeconds(time.Nanosecond * 138), toSeconds(time.Nanosecond * 140),
+			toSeconds(time.Nanosecond * 150), toSeconds(time.Nanosecond * 160), toSeconds(time.Nanosecond * 170),
+			toSeconds(time.Nanosecond * 180), toSeconds(time.Nanosecond * 190), toSeconds(time.Nanosecond * 200),
+			toSeconds(time.Nanosecond * 300), toSeconds(time.Nanosecond * 400), toSeconds(time.Nanosecond * 500),
 		},
 	}, []string{"method"})
 )
@@ -74,5 +83,5 @@ func (m *Metrics) Stop(ctx context.Context) error {
 }
 
 func toSeconds(dur time.Duration) float64 {
-	return float64(dur) / float64(time.Second)
+	return dur.Seconds()
 }

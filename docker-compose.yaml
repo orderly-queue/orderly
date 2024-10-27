@@ -30,10 +30,11 @@ services:
       '
 
   api:
+    container_name: orderly
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["/api", "--config", "/config/orderly.yaml"]
+    command: ["serve", "--config", "/config/orderly.yaml"]
     ports:
       - 8765:8765
       - 8766:8766
