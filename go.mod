@@ -19,7 +19,7 @@ require (
 	github.com/olahol/melody v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
-	github.com/redis/rueidis v1.0.47
+	github.com/redis/rueidis v1.0.48
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.33.0
