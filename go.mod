@@ -3,7 +3,7 @@ module github.com/orderly-queue/orderly
 go 1.23.1
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.0.4
+	github.com/brianvoe/gofakeit/v7 v7.1.1
 	github.com/docker/go-connections v0.5.0
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/go-kit/log v0.2.1
