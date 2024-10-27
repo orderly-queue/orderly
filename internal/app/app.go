@@ -10,6 +10,7 @@ import (
 	"github.com/orderly-queue/orderly/internal/jwt"
 	"github.com/orderly-queue/orderly/internal/metrics"
 	"github.com/orderly-queue/orderly/internal/probes"
+	"github.com/orderly-queue/orderly/internal/queue"
 	"github.com/orderly-queue/orderly/internal/storage"
 	"github.com/thanos-io/objstore"
 )
@@ -30,6 +31,8 @@ type App struct {
 
 	Jwt *jwt.Jwt
 
+	Queue *queue.Queue
+
 	Probes  *probes.Probes
 	Metrics *metrics.Metrics
 
@@ -48,6 +51,8 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 		Config: conf,
 
 		Jwt: jwt.New(conf.JwtSecret),
+
+		Queue: queue.New(),
 
 		Encryption: enc,
 

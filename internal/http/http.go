@@ -13,6 +13,7 @@ import (
 	mw "github.com/labstack/echo/v4/middleware"
 	"github.com/orderly-queue/orderly/internal/app"
 	"github.com/orderly-queue/orderly/internal/http/common"
+	"github.com/orderly-queue/orderly/internal/http/handlers/connect"
 	"github.com/orderly-queue/orderly/internal/http/middleware"
 	"github.com/orderly-queue/orderly/internal/logger"
 )
@@ -50,6 +51,8 @@ func New(app *app.App) *Http {
 	}
 
 	h.e.HTTPErrorHandler = h.handleError
+
+	h.Register(connect.NewConnect(app))
 
 	return h
 }
