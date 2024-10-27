@@ -80,7 +80,7 @@ func (q *Queue) Drain() {
 }
 
 func (q *Queue) Consume(ctx context.Context) (<-chan string, error) {
-	id, notify, err := q.listen()
+	id, _, err := q.listen()
 	if err != nil {
 		return nil, err
 	}
@@ -88,14 +88,15 @@ func (q *Queue) Consume(ctx context.Context) (<-chan string, error) {
 	out := make(chan string, 100)
 
 	go func() {
-		tick := time.NewTicker(time.Second)
+		metrics.Consumers.Inc()
+		defer metrics.Consumers.Dec()
+		tick := time.NewTicker(time.Millisecond)
 		defer tick.Stop()
+
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case <-notify:
-				q.tryPop(ctx, out)
 			case <-tick.C:
 				q.tryPop(ctx, out)
 			}
@@ -140,7 +141,27 @@ func (q *Queue) ignore(id uuid.UUID) {
 }
 
 func (q *Queue) Snapshot() []string {
-	panic("not implemented")
+	out, _ := measure("snapshot", func() ([]string, error) {
+		out := make([]string, q.Len())
+		q.mu.Lock()
+		defer q.mu.Unlock()
+		for e := q.list.Front(); e != nil; e = e.Next() {
+			out = append(out, e.Value.(string))
+		}
+		return out, nil
+	})
+	return out
+}
+
+// Empties the queue and loads the data into it form the input slice
+func (q *Queue) Load(data []string) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	for _, d := range data {
+		if d != "" {
+			q.list.PushBack(d)
+		}
+	}
 }
 
 func measure[T any](method string, f func() (T, error)) (T, error) {

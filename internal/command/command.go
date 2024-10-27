@@ -13,10 +13,12 @@ var (
 type Keyword string
 
 var (
-	Len   Keyword = "len"
-	Push  Keyword = "push"
-	Pop   Keyword = "pop"
-	Drain Keyword = "drain"
+	Len     Keyword = "len"
+	Push    Keyword = "push"
+	Pop     Keyword = "pop"
+	Drain   Keyword = "drain"
+	Consume Keyword = "consume"
+	Stop    Keyword = "stop"
 )
 
 type Command struct {
@@ -58,6 +60,14 @@ func Parse(input string) (Command, error) {
 	case Drain:
 		if len(cmd.Args) > 0 {
 			return cmd, fmt.Errorf("%w: drain takes no args", ErrInvalidSyntax)
+		}
+	case Consume:
+		if len(cmd.Args) > 0 {
+			return cmd, fmt.Errorf("%w: consume takes no args", ErrInvalidSyntax)
+		}
+	case Stop:
+		if len(cmd.Args) > 0 {
+			return cmd, fmt.Errorf("%w: stop takes no args", ErrInvalidSyntax)
 		}
 	default:
 		return Command{ID: spl[0]}, fmt.Errorf("%w: unknown keyword", ErrInvalidSyntax)

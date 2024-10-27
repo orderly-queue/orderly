@@ -24,6 +24,18 @@ func New(app *app.App) *cobra.Command {
 				app.Http.Stop(ctx)
 			}()
 
+			state, err := app.Snapshotter.Latest(cmd.Context())
+			if err != nil {
+				return err
+			}
+			app.Queue.Load(state)
+
+			if err := app.Snapshotter.Work(cmd.Context()); err != nil {
+				return err
+			}
+			// Run a snapshot before shutdown so we don't load up stale data
+			defer app.Snapshotter.Snapshot(context.Background())
+
 			go app.Metrics.Start(cmd.Context())
 
 			app.Probes.Ready()

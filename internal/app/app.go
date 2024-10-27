@@ -11,6 +11,7 @@ import (
 	"github.com/orderly-queue/orderly/internal/metrics"
 	"github.com/orderly-queue/orderly/internal/probes"
 	"github.com/orderly-queue/orderly/internal/queue"
+	"github.com/orderly-queue/orderly/internal/snapshotter"
 	"github.com/orderly-queue/orderly/internal/storage"
 	"github.com/thanos-io/objstore"
 )
@@ -31,7 +32,8 @@ type App struct {
 
 	Jwt *jwt.Jwt
 
-	Queue *queue.Queue
+	Queue       *queue.Queue
+	Snapshotter *snapshotter.Snapshotter
 
 	Probes  *probes.Probes
 	Metrics *metrics.Metrics
@@ -67,6 +69,8 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 		}
 		app.Storage = storage
 	}
+
+	app.Snapshotter = snapshotter.New(conf.Queue.Snapshot, app.Queue, app.Storage)
 
 	return app, nil
 }

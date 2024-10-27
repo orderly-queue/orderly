@@ -1,9 +1,11 @@
 package connect
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/olahol/melody"
@@ -14,10 +16,17 @@ import (
 
 type ConnectHandler struct {
 	app *app.App
+
+	consumers      map[string]context.CancelFunc
+	consumersMutex *sync.Mutex
 }
 
 func NewConnect(app *app.App) *ConnectHandler {
-	return &ConnectHandler{app: app}
+	return &ConnectHandler{
+		app:            app,
+		consumers:      make(map[string]context.CancelFunc),
+		consumersMutex: &sync.Mutex{},
+	}
 }
 
 func (h *ConnectHandler) Handler() echo.HandlerFunc {
@@ -40,6 +49,10 @@ func (h *ConnectHandler) Handler() echo.HandlerFunc {
 				h.push(s, cmd)
 			case command.Pop:
 				h.pop(s, cmd)
+			case command.Consume:
+				go h.consume(s, cmd)
+			case command.Stop:
+				h.stop(cmd)
 			}
 		})
 
@@ -66,6 +79,39 @@ func (c *ConnectHandler) pop(s *melody.Session, cmd command.Command) error {
 		return fail(s, cmd.ID, err)
 	}
 	return respond(s, command.Build(cmd.ID, item))
+}
+
+func (c *ConnectHandler) consume(s *melody.Session, cmd command.Command) {
+	ctx, cancel := context.WithCancel(s.Request.Context())
+	c.consumersMutex.Lock()
+	c.consumers[cmd.ID] = cancel
+	c.consumersMutex.Unlock()
+
+	msgs, err := c.app.Queue.Consume(ctx)
+	if err != nil {
+		fail(s, cmd.ID, errors.New("failed to start consuming"))
+		return
+	}
+
+	respond(s, command.Build(cmd.ID, "ok"))
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-msgs:
+			respond(s, command.Build(cmd.ID, msg))
+		}
+	}
+}
+
+func (c *ConnectHandler) stop(cmd command.Command) {
+	c.consumersMutex.Lock()
+	defer c.consumersMutex.Unlock()
+	cancel, ok := c.consumers[cmd.ID]
+	if ok {
+		cancel()
+	}
 }
 
 func respond(s *melody.Session, resp command.Response) error {

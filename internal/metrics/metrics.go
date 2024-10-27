@@ -33,6 +33,11 @@ var (
 			toSeconds(time.Nanosecond * 300), toSeconds(time.Nanosecond * 400), toSeconds(time.Nanosecond * 500),
 		},
 	}, []string{"method"})
+
+	Consumers = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "orderly_consumers",
+		Help: "The current number of ocnnected consumers",
+	})
 )
 
 type Metrics struct {
@@ -58,6 +63,7 @@ func New(port int) *Metrics {
 
 	m.reg.Do(func() {
 		m.Registry.MustRegister(CommandSeconds)
+		m.Registry.MustRegister(Consumers)
 	})
 
 	m.e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{

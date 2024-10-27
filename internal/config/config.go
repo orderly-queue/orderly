@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"os"
-	"time"
 
 	"github.com/grafana/pyroscope-go"
 	"go.uber.org/zap"
@@ -119,8 +118,13 @@ type Storage struct {
 	Config  map[string]any `yaml:"config"`
 }
 
+type Snapshot struct {
+	Schedule      string `yaml:"schedule"`
+	RetentionDays uint   `yaml:"retention_days"`
+}
+
 type Queue struct {
-	SnapshotInterval time.Duration `yaml:"snapshot_interval"`
+	Snapshot Snapshot `yaml:"snapshot"`
 }
 
 type Config struct {
@@ -199,7 +203,7 @@ func (c *Config) setDefaults() {
 	if c.Telemetry.Profiling.ServiceName == "" {
 		c.Telemetry.Profiling.ServiceName = c.Name
 	}
-	if c.Queue.SnapshotInterval == 0 {
-		c.Queue.SnapshotInterval = time.Hour
+	if c.Queue.Snapshot.Schedule == "" {
+		c.Queue.Snapshot.Schedule = "0 * * * *"
 	}
 }
