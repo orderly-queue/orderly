@@ -8,14 +8,13 @@ import (
 	"net/http"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
-	"github.com/orderly-queue/orderly/internal/app"
-	"github.com/orderly-queue/orderly/internal/http/common"
-	"github.com/orderly-queue/orderly/internal/http/handlers/users"
-	"github.com/orderly-queue/orderly/internal/http/middleware"
-	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
+	"github.com/orderly-queue/orderly/internal/app"
+	"github.com/orderly-queue/orderly/internal/http/common"
+	"github.com/orderly-queue/orderly/internal/http/middleware"
+	"github.com/orderly-queue/orderly/internal/logger"
 )
 
 type Http struct {
@@ -35,7 +34,6 @@ func New(app *app.App) *Http {
 	if app.Config.Telemetry.Metrics.Enabled {
 		e.Use(middleware.Metrics(app.Config.Telemetry, app.Metrics.Registry))
 	}
-	e.Use(middleware.User(app))
 	if app.Config.Telemetry.Sentry.Enabled {
 		e.Use(sentryecho.New(sentryecho.Options{
 			Repanic: true,
@@ -52,13 +50,6 @@ func New(app *app.App) *Http {
 	}
 
 	h.e.HTTPErrorHandler = h.handleError
-
-	h.Register(users.NewLogin(app))
-	h.Register(users.NewLogout(app))
-	h.Register(users.NewRegister(app))
-	h.Register(users.NewMe(app))
-	h.Register(users.NewMakeAdmin(app))
-	h.Register(users.NewRemoveAdmin(app))
 
 	return h
 }

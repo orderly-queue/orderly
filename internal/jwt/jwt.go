@@ -3,12 +3,9 @@ package jwt
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/orderly-queue/orderly/internal/crypto"
-	"github.com/orderly-queue/orderly/internal/users"
 	"github.com/redis/rueidis"
 )
 
@@ -21,23 +18,20 @@ type Jwt struct {
 	redis  rueidis.Client
 }
 
-func New(secret string, redis rueidis.Client) *Jwt {
+func New(secret string) *Jwt {
 	return &Jwt{
 		secret: secret,
-		redis:  redis,
 	}
 }
 
-type userClaims struct {
-	User *users.User
+type claims struct {
 	jwt.StandardClaims
 }
 
-func (j *Jwt) NewForUser(user *users.User, expires time.Duration) (string, error) {
+func (j *Jwt) New(expires time.Duration) (string, error) {
 	exp := time.Now().Add(expires)
 
-	claims := userClaims{
-		user,
+	claims := claims{
 		jwt.StandardClaims{
 			ExpiresAt: exp.Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -54,29 +48,16 @@ func (j *Jwt) NewForUser(user *users.User, expires time.Duration) (string, error
 	return tokenStr, nil
 }
 
-func (j *Jwt) VerifyUser(ctx context.Context, token string) (*users.User, error) {
-	hash := crypto.Sum(token)
-
-	// Check if the token has been invalidated first
-	cmd := j.redis.B().Get().Key(j.invalidatedKey(hash)).Build()
-	res := j.redis.Do(ctx, cmd)
-	if err := res.Error(); err != nil {
-		if !errors.Is(err, rueidis.Nil) {
-			return nil, err
-		}
-	} else {
-		return nil, ErrInvalidated
-	}
-
-	claims, err := j.getUserClaims(token)
+func (j *Jwt) Verify(ctx context.Context, token string) error {
+	_, err := j.getClaims(token)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return claims.User, nil
+	return nil
 }
 
-func (j *Jwt) getUserClaims(token string) (*userClaims, error) {
-	claims := &userClaims{}
+func (j *Jwt) getClaims(token string) (*claims, error) {
+	claims := &claims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		return []byte(j.secret), nil
 	})
@@ -84,22 +65,4 @@ func (j *Jwt) getUserClaims(token string) (*userClaims, error) {
 		return nil, err
 	}
 	return claims, nil
-}
-
-func (j *Jwt) InvalidateUser(ctx context.Context, token string) error {
-	claims, err := j.getUserClaims(token)
-	if err != nil {
-		return err
-	}
-
-	expires := time.Unix(claims.ExpiresAt, 0)
-	remaining := time.Until(expires)
-
-	cmd := j.redis.B().Set().Key(j.invalidatedKey(crypto.Sum(token))).Value("true").Ex(remaining).Build()
-	res := j.redis.Do(ctx, cmd)
-	return res.Error()
-}
-
-func (j *Jwt) invalidatedKey(hash string) string {
-	return fmt.Sprintf("tokens:invalidated:%s", hash)
 }

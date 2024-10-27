@@ -14,7 +14,7 @@ tasks:
   up:
     desc: Stand up the docker containers
     cmds:
-      - docker compose up -d redis postgres minio init-minio
+      - docker compose up -d minio init-minio
 
   test:unit:
     desc: Run the unit tests
@@ -30,29 +30,6 @@ tasks:
     desc: Run the api
     cmds:
       - go run main.go serve
-
-  migrate:new:
-    desc: Create a new migration from the initial schema
-    dir: database
-    cmds:
-      - rm migrations/files/.gitkeep || true
-      - atlas migrate diff {{ .CLI_ARGS }} --env {{ .ENV | default "postgres" }}
-
-  migrate:fmt:
-    desc: Format the atlas schema
-    dir: database
-    cmds:
-      - atlas schema fmt
-
-  migrate:up:
-    desc: Run the up migrations
-    cmds:
-      - go run main.go migrate up
-
-  migrate:down:
-    desc: Run the down migrations
-    cmds:
-      - go run main.go migrate down
 
   jwt:secret:
     desc: Generate a JWT sercet

@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"os"
-	"time"
 
 	"github.com/grafana/pyroscope-go"
 	"go.uber.org/zap"
@@ -23,16 +22,6 @@ func (l LogLevel) Level() zap.AtomicLevel {
 	default:
 		return zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
-}
-
-type Postgres struct {
-	Url string `yaml:"url"`
-}
-
-type Redis struct {
-	Addr          string        `yaml:"addr"`
-	Password      string        `yaml:"password"`
-	MaxFlushDelay time.Duration `yaml:"max_flush_delay"`
 }
 
 type Tracing struct {
@@ -139,8 +128,6 @@ type Config struct {
 	JwtSecret     string `yaml:"jwt_secret"`
 
 	LogLevel LogLevel `yaml:"log_level"`
-	Database Postgres `yaml:"database"`
-	Redis    Redis    `yaml:"redis"`
 
 	Probes Probes `yaml:"probes"`
 	Http   Http   `yaml:"http"`
@@ -168,12 +155,6 @@ func Load(path string) (*Config, error) {
 }
 
 func (c *Config) validate() error {
-	if c.Database.Url == "" {
-		return errors.New("invalid db url")
-	}
-	if c.Redis.Addr == "" {
-		return errors.New("invalid redis addr")
-	}
 	if c.Name == "" {
 		return errors.New("name must be set")
 	}
@@ -195,9 +176,6 @@ func (c *Config) validate() error {
 func (c *Config) setDefaults() {
 	if c.Environment == "" {
 		c.Environment = "dev"
-	}
-	if c.Redis.MaxFlushDelay == 0 {
-		c.Redis.MaxFlushDelay = time.Microsecond * 100
 	}
 	if c.Http.Port == 0 {
 		c.Http.Port = 8765

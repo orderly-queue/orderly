@@ -16,13 +16,6 @@ config:
   jwt_secret: '{{ .jwt_secret }}'
   encryption_key: '{{ .encryption_key }}'
 
-  database:
-    url: '{{ .db_url }}'
-
-  redis:
-    addr: 127.0.0.1:6379
-    password: '{{ .redis_password }}'
-
   probes:
     port: 8767
 
