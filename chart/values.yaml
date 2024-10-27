@@ -10,7 +10,7 @@ secrets:
   name: ""
 
 config:
-  name: go-template
+  name: orderly
   environment: prod
   log_level: info
   jwt_secret: '{{ .jwt_secret }}'
@@ -43,7 +43,7 @@ config:
 replicaCount: 1
 
 image:
-  repository: ghcr.io/henrywhitaker3/go-template
+  repository: ghcr.io/orderly-queue/orderly
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

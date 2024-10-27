@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/config"
-	"github.com/henrywhitaker3/go-template/internal/storage"
-	"github.com/henrywhitaker3/go-template/internal/test"
+	"github.com/orderly-queue/orderly/internal/config"
+	"github.com/orderly-queue/orderly/internal/storage"
+	"github.com/orderly-queue/orderly/internal/test"
 	"github.com/stretchr/testify/require"
 )
 

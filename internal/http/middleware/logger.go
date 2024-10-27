@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/http/common"
-	"github.com/henrywhitaker3/go-template/internal/logger"
+	"github.com/orderly-queue/orderly/internal/http/common"
+	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )

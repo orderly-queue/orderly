@@ -1,4 +1,4 @@
-module github.com/henrywhitaker3/go-template
+module github.com/orderly-queue/orderly
 
 go 1.23.1
 

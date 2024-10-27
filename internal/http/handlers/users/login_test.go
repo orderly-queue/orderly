@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/http/handlers/users"
-	"github.com/henrywhitaker3/go-template/internal/test"
+	"github.com/orderly-queue/orderly/internal/http/handlers/users"
+	"github.com/orderly-queue/orderly/internal/test"
 	"github.com/stretchr/testify/require"
 )
 

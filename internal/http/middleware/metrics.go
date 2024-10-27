@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/henrywhitaker3/go-template/internal/config"
+	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"

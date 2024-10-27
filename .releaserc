@@ -1,6 +1,6 @@
 {
   "branches": ["main"],
-  "repositoryUrl": "https://github.com/henrywhitaker3/go-template",
+  "repositoryUrl": "https://github.com/orderly-queue/orderly",
   "plugins": [
     [
       "@semantic-release/github",

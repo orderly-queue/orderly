@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
-	"github.com/henrywhitaker3/go-template/internal/app"
-	"github.com/henrywhitaker3/go-template/internal/config"
-	"github.com/henrywhitaker3/go-template/internal/http"
-	"github.com/henrywhitaker3/go-template/internal/logger"
-	pg "github.com/henrywhitaker3/go-template/internal/postgres"
-	"github.com/henrywhitaker3/go-template/internal/users"
+	"github.com/orderly-queue/orderly/internal/app"
+	"github.com/orderly-queue/orderly/internal/config"
+	"github.com/orderly-queue/orderly/internal/http"
+	"github.com/orderly-queue/orderly/internal/logger"
+	pg "github.com/orderly-queue/orderly/internal/postgres"
+	"github.com/orderly-queue/orderly/internal/users"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -32,7 +32,7 @@ var (
 )
 
 func init() {
-	re := regexp.MustCompile(`^(.*go-template)`)
+	re := regexp.MustCompile(`^(.*orderly)`)
 	cwd, _ := os.Getwd()
 	rootPath := re.Find([]byte(cwd))
 	root = string(rootPath)
@@ -77,7 +77,7 @@ func newApp(t *testing.T) (*app.App, context.CancelFunc) {
 	)
 	require.Nil(t, err)
 
-	conf, err := config.Load(fmt.Sprintf("%s/go-template.example.yaml", root))
+	conf, err := config.Load(fmt.Sprintf("%s/orderly.example.yaml", root))
 	require.Nil(t, err)
 	conn, err := pgCont.ConnectionString(context.Background())
 	require.Nil(t, err)

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/henrywhitaker3/go-template/internal/config"
+	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )

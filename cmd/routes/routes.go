@@ -3,7 +3,7 @@ package routes
 import (
 	"fmt"
 
-	"github.com/henrywhitaker3/go-template/internal/app"
+	"github.com/orderly-queue/orderly/internal/app"
 	"github.com/spf13/cobra"
 )
 

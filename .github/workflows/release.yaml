@@ -50,8 +50,8 @@ jobs:
       - name: Push chart
         uses: appany/helm-oci-chart-releaser@v0.4.2
         with:
-          name: go-template-helm
-          repository: henrywhitaker3
+          name: orderly-helm
+          repository: orderly-queue
           tag: "v${{ env.CHART_VERSION }}"
           path: chart
           registry: ghcr.io
@@ -78,7 +78,7 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/henrywhitaker3/go-template:latest
-            ghcr.io/henrywhitaker3/go-template:${{ github.ref_name }}
+            ghcr.io/orderly-queue/orderly:latest
+            ghcr.io/orderly-queue/orderly:${{ github.ref_name }}
           build-args: |
             VERSION=${{ github.ref_name }}

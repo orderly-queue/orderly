@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/config"
+	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/redis/rueidis"
 	"github.com/redis/rueidis/rueidisotel"
 )

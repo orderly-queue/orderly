@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Go Template",
+  "name": "orderly",
   "type": "collection",
   "ignore": [
     "node_modules",

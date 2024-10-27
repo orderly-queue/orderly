@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/database/queries"
-	"github.com/henrywhitaker3/go-template/internal/crypto"
-	"github.com/henrywhitaker3/go-template/internal/uuid"
+	"github.com/orderly-queue/orderly/database/queries"
+	"github.com/orderly-queue/orderly/internal/crypto"
+	"github.com/orderly-queue/orderly/internal/uuid"
 )
 
 type User struct {

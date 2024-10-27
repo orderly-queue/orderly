@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/jwt"
-	"github.com/henrywhitaker3/go-template/internal/test"
-	"github.com/henrywhitaker3/go-template/internal/users"
-	"github.com/henrywhitaker3/go-template/internal/uuid"
+	"github.com/orderly-queue/orderly/internal/jwt"
+	"github.com/orderly-queue/orderly/internal/test"
+	"github.com/orderly-queue/orderly/internal/users"
+	"github.com/orderly-queue/orderly/internal/uuid"
 	"github.com/stretchr/testify/require"
 )
 

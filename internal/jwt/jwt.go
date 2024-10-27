@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/henrywhitaker3/go-template/internal/crypto"
-	"github.com/henrywhitaker3/go-template/internal/users"
+	"github.com/orderly-queue/orderly/internal/crypto"
+	"github.com/orderly-queue/orderly/internal/users"
 	"github.com/redis/rueidis"
 )
 

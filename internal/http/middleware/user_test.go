@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/henrywhitaker3/go-template/internal/test"
+	"github.com/orderly-queue/orderly/internal/test"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 )

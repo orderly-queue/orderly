@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/henrywhitaker3/go-template/internal/http/common"
+	"github.com/orderly-queue/orderly/internal/http/common"
 	"github.com/labstack/echo/v4"
 )
 

@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/henrywhitaker3/go-template/internal/app"
+	"github.com/orderly-queue/orderly/internal/app"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 )

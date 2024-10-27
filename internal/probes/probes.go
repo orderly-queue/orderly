@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/henrywhitaker3/go-template/internal/logger"
+	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/labstack/echo/v4"
 )
 

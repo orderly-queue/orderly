@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/henrywhitaker3/ctxgen"
-	"github.com/henrywhitaker3/go-template/internal/users"
+	"github.com/orderly-queue/orderly/internal/users"
 	"github.com/labstack/echo/v4"
 )
 

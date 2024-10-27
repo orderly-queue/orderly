@@ -11,13 +11,13 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/grafana/pyroscope-go"
-	"github.com/henrywhitaker3/go-template/cmd/root"
-	"github.com/henrywhitaker3/go-template/cmd/secrets"
-	"github.com/henrywhitaker3/go-template/internal/app"
-	"github.com/henrywhitaker3/go-template/internal/config"
-	"github.com/henrywhitaker3/go-template/internal/http"
-	"github.com/henrywhitaker3/go-template/internal/logger"
-	"github.com/henrywhitaker3/go-template/internal/tracing"
+	"github.com/orderly-queue/orderly/cmd/root"
+	"github.com/orderly-queue/orderly/cmd/secrets"
+	"github.com/orderly-queue/orderly/internal/app"
+	"github.com/orderly-queue/orderly/internal/config"
+	"github.com/orderly-queue/orderly/internal/http"
+	"github.com/orderly-queue/orderly/internal/logger"
+	"github.com/orderly-queue/orderly/internal/tracing"
 )
 
 var (
@@ -141,7 +141,7 @@ func getConfigPath() string {
 			return os.Args[i+1]
 		}
 	}
-	return "go-template.yaml"
+	return "orderly.yaml"
 }
 
 func noConfigHelp() {
@@ -149,7 +149,7 @@ func noConfigHelp() {
 	api [command]
 
 Flags:
-	-c, --config	The path to the api config file (default: go-template.yaml)
+	-c, --config	The path to the api config file (default: orderly.yaml)
 	`
 	fmt.Println(help)
 	os.Exit(3)

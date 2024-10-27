@@ -50,13 +50,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["/api", "--config", "/config/go-template.yaml"]
+    command: ["/api", "--config", "/config/orderly.yaml"]
     ports:
       - 8765:8765
       - 8766:8766
       - 8767:8767
     volumes:
-      - ./go-template.yaml:/config/go-template.yaml:ro
+      - ./orderly.yaml:/config/orderly.yaml:ro
 
 volumes:
   postgres:
