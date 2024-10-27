@@ -142,11 +142,14 @@ func (q *Queue) ignore(id uuid.UUID) {
 
 func (q *Queue) Snapshot() []string {
 	out, _ := measure("snapshot", func() ([]string, error) {
-		out := make([]string, q.Len())
+		out := []string{}
 		q.mu.Lock()
 		defer q.mu.Unlock()
 		for e := q.list.Front(); e != nil; e = e.Next() {
-			out = append(out, e.Value.(string))
+			o, ok := e.Value.(string)
+			if ok {
+				out = append(out, o)
+			}
 		}
 		return out, nil
 	})
