@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/redis/rueidis"
 )
 
 var (
@@ -15,7 +14,6 @@ var (
 
 type Jwt struct {
 	secret string
-	redis  rueidis.Client
 }
 
 func New(secret string) *Jwt {
