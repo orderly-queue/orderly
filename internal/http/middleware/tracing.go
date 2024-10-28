@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/labstack/echo/v4"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )
 

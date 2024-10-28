@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/orderly-queue/orderly/internal/crypto"
 	"github.com/orderly-queue/orderly/internal/jwt"
 	"github.com/orderly-queue/orderly/internal/metrics"
@@ -13,6 +12,7 @@ import (
 	"github.com/orderly-queue/orderly/internal/queue"
 	"github.com/orderly-queue/orderly/internal/snapshotter"
 	"github.com/orderly-queue/orderly/internal/storage"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/thanos-io/objstore"
 )
 

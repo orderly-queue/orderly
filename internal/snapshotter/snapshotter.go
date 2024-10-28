@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/orderly-queue/orderly/internal/logger"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/thanos-io/objstore"
 )

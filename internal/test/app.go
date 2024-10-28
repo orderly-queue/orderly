@@ -12,9 +12,9 @@ import (
 
 	"github.com/docker/go-connections/nat"
 	"github.com/orderly-queue/orderly/internal/app"
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/orderly-queue/orderly/internal/http"
 	"github.com/orderly-queue/orderly/internal/logger"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"

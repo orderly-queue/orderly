@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/go-kit/log"
-	"github.com/orderly-queue/orderly/internal/config"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/thanos-io/objstore"
 	"github.com/thanos-io/objstore/providers/filesystem"
 	"github.com/thanos-io/objstore/providers/s3"

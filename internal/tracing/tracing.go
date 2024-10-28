@@ -4,7 +4,7 @@ import (
 	"context"
 
 	otelpyroscope "github.com/grafana/otel-profiling-go"
-	"github.com/orderly-queue/orderly/internal/config"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"

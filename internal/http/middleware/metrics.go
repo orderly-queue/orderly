@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

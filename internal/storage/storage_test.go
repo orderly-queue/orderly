@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/orderly-queue/orderly/internal/storage"
 	"github.com/orderly-queue/orderly/internal/test"
+	"github.com/orderly-queue/orderly/pkg/config"
 	"github.com/stretchr/testify/require"
 )
 

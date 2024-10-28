@@ -14,10 +14,10 @@ import (
 	"github.com/orderly-queue/orderly/cmd/root"
 	"github.com/orderly-queue/orderly/cmd/secrets"
 	"github.com/orderly-queue/orderly/internal/app"
-	"github.com/orderly-queue/orderly/internal/config"
 	"github.com/orderly-queue/orderly/internal/http"
 	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/orderly-queue/orderly/internal/tracing"
+	"github.com/orderly-queue/orderly/pkg/config"
 )
 
 var (
