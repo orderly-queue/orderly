@@ -158,15 +158,15 @@ func Load(path string) (*Config, error) {
 		return nil, err
 	}
 
-	conf.setDefaults()
-	if err := conf.validate(); err != nil {
+	conf.SetDefaults()
+	if err := conf.Validate(); err != nil {
 		return nil, err
 	}
 
 	return &conf, nil
 }
 
-func (c *Config) validate() error {
+func (c *Config) Validate() error {
 	if c.Name == "" {
 		return errors.New("name must be set")
 	}
@@ -185,7 +185,7 @@ func (c *Config) validate() error {
 	return nil
 }
 
-func (c *Config) setDefaults() {
+func (c *Config) SetDefaults() {
 	if c.Environment == "" {
 		c.Environment = "dev"
 	}
