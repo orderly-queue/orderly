@@ -70,7 +70,7 @@ func New(ctx context.Context, conf *config.Config) (*App, error) {
 		app.Storage = storage
 	}
 
-	app.Snapshotter = snapshotter.New(conf.Queue.Snapshot, app.Queue, app.Storage)
+	app.Snapshotter = snapshotter.New(conf.Queue.Snapshot, app.Queue, app.Storage, app.Metrics.Registry)
 
 	return app, nil
 }
