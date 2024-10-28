@@ -24,7 +24,11 @@ func New(app *app.App) *cobra.Command {
 				app.Http.Stop(ctx)
 			}()
 
-			state, err := app.Snapshotter.Latest(cmd.Context())
+			snapshot, err := app.Snapshotter.Latest(cmd.Context())
+			if err != nil {
+				return err
+			}
+			state, err := app.Snapshotter.Open(cmd.Context(), *snapshot)
 			if err != nil {
 				return err
 			}

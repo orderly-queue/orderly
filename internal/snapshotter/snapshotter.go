@@ -109,22 +109,18 @@ func (s *Snapshotter) report(ctx context.Context) error {
 	return nil
 }
 
-func (s *Snapshotter) Latest(ctx context.Context) ([]string, error) {
-	files := map[time.Time]string{}
-	if err := s.bucket.Iter(ctx, "", func(name string) error {
-		t, err := time.Parse(time.RFC3339, strings.ReplaceAll(name, ".state", ""))
-		if err != nil {
-			logger.Logger(ctx).Errorw("failed to parse snapshot name", "error", err)
-			return nil
-		}
-		files[t] = name
-		return nil
-	}); err != nil {
-		return nil, fmt.Errorf("%w: failed to iterate over bucket", err)
+func (s *Snapshotter) Latest(ctx context.Context) (*Snapshot, error) {
+	files := map[time.Time]Snapshot{}
+	snapshots, err := s.collect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, s := range snapshots {
+		files[s.Time] = s
 	}
 
 	if len(files) == 0 {
-		return []string{}, nil
+		return nil, nil
 	}
 
 	latest := time.Now().Add(-time.Hour * 24 * 365 * 10)
@@ -133,20 +129,25 @@ func (s *Snapshotter) Latest(ctx context.Context) ([]string, error) {
 			latest = t
 		}
 	}
+	l := files[latest]
 
-	logger.Logger(ctx).Infow("loading snapshot", "snapshot", files[latest])
+	return &l, nil
+}
 
-	state, err := s.bucket.Get(ctx, files[latest])
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to get file", err)
-	}
-	read, err := io.ReadAll(state)
+func (s *Snapshotter) Open(ctx context.Context, snapshot Snapshot) ([]string, error) {
+	logger := logger.Logger(ctx)
+	logger.Infow("opening snapshot", "name", snapshot.Name)
+
+	raw, err := s.bucket.Get(ctx, snapshot.Name)
 	if err != nil {
 		return nil, err
 	}
-
+	by, err := io.ReadAll(raw)
+	if err != nil {
+		return nil, err
+	}
 	out := []string{}
-	if err := json.Unmarshal(read, &out); err != nil {
+	if err := json.Unmarshal(by, &out); err != nil {
 		return nil, err
 	}
 	return out, nil

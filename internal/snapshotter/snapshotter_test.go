@@ -25,10 +25,11 @@ func TestItBacksupAQueue(t *testing.T) {
 	app.Queue.Drain()
 	require.Equal(t, uint(0), app.Queue.Len())
 
-	state, err := app.Snapshotter.Latest(ctx)
+	snap, err := app.Snapshotter.Latest(ctx)
+	require.Nil(t, err)
+	state, err := app.Snapshotter.Open(ctx, *snap)
 	require.Nil(t, err)
 	require.Len(t, state, 1)
-
 	app.Queue.Load(state)
 
 	require.Equal(t, uint(1), app.Queue.Len())
