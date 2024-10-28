@@ -31,6 +31,7 @@ services:
 
   api:
     container_name: orderly
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,6 +42,11 @@ services:
       - 8767:8767
     volumes:
       - ./orderly.yaml:/config/orderly.yaml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: 2.0
+          memory: 256M
 
 volumes:
   postgres:

@@ -38,6 +38,11 @@ var (
 		Name: "orderly_consumers",
 		Help: "The current number of ocnnected consumers",
 	})
+
+	Size = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "orderly_queue_size",
+		Help: "The size of the queue",
+	})
 )
 
 type Metrics struct {
@@ -66,6 +71,7 @@ func New(port int) *Metrics {
 	m.reg.Do(func() {
 		m.Registry.MustRegister(CommandSeconds)
 		m.Registry.MustRegister(Consumers)
+		m.Registry.MustRegister(Size)
 	})
 
 	m.e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{

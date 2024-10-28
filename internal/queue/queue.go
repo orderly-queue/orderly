@@ -167,6 +167,20 @@ func (q *Queue) Load(data []string) {
 	}
 }
 
+// Blocking loop that reports queue size every 500ms
+func (q *Queue) Report(ctx context.Context) {
+	tick := time.NewTicker(time.Millisecond * 500)
+	defer tick.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-tick.C:
+			metrics.Size.Set(float64(q.Len()))
+		}
+	}
+}
+
 func measure[T any](method string, f func() (T, error)) (T, error) {
 	start := time.Now()
 

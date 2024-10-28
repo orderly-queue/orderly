@@ -119,6 +119,7 @@ type Storage struct {
 }
 
 type Snapshot struct {
+	Enabled       bool   `yaml:"enabled"`
 	Schedule      string `yaml:"schedule"`
 	RetentionDays uint   `yaml:"retention_days"`
 }
