@@ -182,6 +182,9 @@ func (c *Config) Validate() error {
 	if c.Telemetry.Profiling.Enabled && c.Telemetry.Profiling.Endpoint == "" {
 		return errors.New("profiling endpoint must be set when enabled")
 	}
+	if c.Queue.Snapshot.Enabled && !c.Storage.Enabled {
+		return errors.New("storage must be configure when snapshots are enabled")
+	}
 	return nil
 }
 
