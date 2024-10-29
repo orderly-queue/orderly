@@ -29,11 +29,13 @@ func New(app *app.App) *cobra.Command {
 				if err != nil {
 					return err
 				}
-				state, err := app.Snapshotter.Open(cmd.Context(), *snapshot)
-				if err != nil {
-					return err
+				if snapshot != nil {
+					state, err := app.Snapshotter.Open(cmd.Context(), *snapshot)
+					if err != nil {
+						return err
+					}
+					app.Queue.Load(state)
 				}
-				app.Queue.Load(state)
 				if err := app.Snapshotter.Work(cmd.Context()); err != nil {
 					return err
 				}
