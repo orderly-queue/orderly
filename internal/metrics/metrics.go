@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 var (
@@ -64,11 +65,13 @@ func New(port int) *Metrics {
 	e.HideBanner = true
 	e.HidePort = true
 
+	reg := prometheus.NewRegistry()
+
 	m := &Metrics{
 		e:        e,
 		port:     port,
-		Registry: prometheus.DefaultRegisterer,
-		Gatherer: prometheus.DefaultGatherer,
+		Registry: reg,
+		Gatherer: reg,
 		reg:      &sync.Once{},
 	}
 
@@ -77,6 +80,9 @@ func New(port int) *Metrics {
 		m.Registry.MustRegister(Consumers)
 		m.Registry.MustRegister(Size)
 		m.Registry.MustRegister(Pending)
+		m.Registry.MustRegister(collectors.NewBuildInfoCollector())
+		m.Registry.MustRegister(collectors.NewGoCollector())
+		m.Registry.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 	})
 
 	m.e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{
