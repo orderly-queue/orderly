@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,8 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/orderly-queue/orderly/internal/app"
 	"github.com/labstack/echo/v4"
+	"github.com/orderly-queue/orderly/internal/app"
 	"github.com/stretchr/testify/require"
 )
 
@@ -80,4 +81,13 @@ func Delete(t *testing.T, app *app.App, url string, body any, apikey string) *ht
 	app.Http.ServeHTTP(rec, req)
 
 	return rec
+}
+
+// Creates a new httptest server pointing at the app, returns the url
+func Server(app *app.App) (string, context.CancelFunc) {
+	srv := httptest.NewServer(app.Http)
+
+	return srv.URL, func() {
+		srv.Close()
+	}
 }

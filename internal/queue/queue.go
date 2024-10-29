@@ -8,10 +8,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/orderly-queue/orderly/internal/command"
 	"github.com/orderly-queue/orderly/internal/logger"
 	"github.com/orderly-queue/orderly/internal/metrics"
 	"github.com/orderly-queue/orderly/internal/uuid"
+	"github.com/orderly-queue/orderly/pkg/sdk/command"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
