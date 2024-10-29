@@ -7,24 +7,26 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/olahol/melody"
 	"github.com/orderly-queue/orderly/internal/app"
-	"github.com/orderly-queue/orderly/internal/command"
 	"github.com/orderly-queue/orderly/internal/queue"
+	"github.com/orderly-queue/orderly/pkg/sdk/command"
+	"github.com/orderly-queue/orderly/pkg/sdk/response"
 )
 
 type ConnectHandler struct {
 	app *app.App
 
-	consumers      map[string]context.CancelFunc
+	consumers      map[uuid.UUID]context.CancelFunc
 	consumersMutex *sync.Mutex
 }
 
 func NewConnect(app *app.App) *ConnectHandler {
 	return &ConnectHandler{
 		app:            app,
-		consumers:      make(map[string]context.CancelFunc),
+		consumers:      make(map[uuid.UUID]context.CancelFunc),
 		consumersMutex: &sync.Mutex{},
 	}
 }
@@ -64,23 +66,23 @@ func (h *ConnectHandler) Handler() echo.HandlerFunc {
 
 func (c *ConnectHandler) len(s *melody.Session, cmd command.Command) error {
 	len := c.app.Queue.Len()
-	return respond(s, command.Build(cmd.ID, fmt.Sprintf("%d", len)))
+	return respond(s, response.Build(cmd.ID, fmt.Sprintf("%d", len)))
 }
 
 func (c *ConnectHandler) push(s *melody.Session, cmd command.Command) error {
 	c.app.Queue.Push(cmd.Args[0])
-	return respond(s, command.Build(cmd.ID, "ok"))
+	return respond(s, response.Build(cmd.ID, "ok"))
 }
 
 func (c *ConnectHandler) pop(s *melody.Session, cmd command.Command) error {
 	item, err := c.app.Queue.Pop()
 	if err != nil {
 		if errors.Is(err, queue.ErrEmptyQueue) {
-			return respond(s, command.Build(cmd.ID, "nil"))
+			return respond(s, response.Build(cmd.ID, "nil"))
 		}
 		return fail(s, cmd.ID, err)
 	}
-	return respond(s, command.Build(cmd.ID, item))
+	return respond(s, response.Build(cmd.ID, item))
 }
 
 func (c *ConnectHandler) consume(s *melody.Session, cmd command.Command) {
@@ -95,14 +97,14 @@ func (c *ConnectHandler) consume(s *melody.Session, cmd command.Command) {
 		return
 	}
 
-	respond(s, command.Build(cmd.ID, "ok"))
+	respond(s, response.Build(cmd.ID, "ok"))
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case msg := <-msgs:
-			respond(s, command.Build(cmd.ID, msg))
+			respond(s, response.Build(cmd.ID, msg))
 		}
 	}
 }
@@ -116,12 +118,12 @@ func (c *ConnectHandler) stop(cmd command.Command) {
 	}
 }
 
-func respond(s *melody.Session, resp command.Response) error {
+func respond(s *melody.Session, resp response.Response) error {
 	return s.Write([]byte(resp.String()))
 }
 
-func fail(s *melody.Session, id string, err error) error {
-	return s.Write([]byte(command.Build(id, fmt.Sprintf("error::%s", err.Error())).String()))
+func fail(s *melody.Session, id uuid.UUID, err error) error {
+	return s.Write([]byte(response.Error(id, err).String()))
 }
 
 func (c *ConnectHandler) Method() string {

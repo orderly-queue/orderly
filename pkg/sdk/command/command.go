@@ -4,10 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 var (
 	ErrInvalidSyntax = errors.New("invalid syntax")
+	ErrInvalidID     = errors.New("id is invalid or could not be parsed")
+	ErrFailedToBuild = errors.New("failed to build command")
 )
 
 type Keyword string
@@ -22,20 +26,38 @@ var (
 )
 
 type Command struct {
-	ID      string
+	ID      uuid.UUID
 	Keyword Keyword
 	Args    []string
+}
+
+func Build(keyword Keyword, args ...string) (Command, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return Command{}, ErrFailedToBuild
+	}
+
+	return Command{
+		ID:      id,
+		Keyword: keyword,
+		Args:    args,
+	}, nil
 }
 
 func Parse(input string) (Command, error) {
 	spl := strings.Split(input, "::")
 
 	if len(spl) < 2 {
-		return Command{ID: spl[0]}, ErrInvalidSyntax
+		return Command{}, ErrInvalidSyntax
+	}
+
+	id, err := uuid.Parse(spl[0])
+	if err != nil {
+		return Command{}, fmt.Errorf("%w: %w", ErrInvalidID, err)
 	}
 
 	cmd := Command{
-		ID:      spl[0],
+		ID:      id,
 		Keyword: Keyword(spl[1]),
 		Args:    []string{},
 	}
@@ -70,8 +92,16 @@ func Parse(input string) (Command, error) {
 			return cmd, fmt.Errorf("%w: stop takes no args", ErrInvalidSyntax)
 		}
 	default:
-		return Command{ID: spl[0]}, fmt.Errorf("%w: unknown keyword", ErrInvalidSyntax)
+		return Command{ID: id}, fmt.Errorf("%w: unknown keyword", ErrInvalidSyntax)
 	}
 
 	return cmd, nil
+}
+
+func (c Command) String() string {
+	out := fmt.Sprintf("%s::%s", c.ID.String(), string(c.Keyword))
+	for _, a := range c.Args {
+		out = fmt.Sprintf("%s::%s", out, a)
+	}
+	return out
 }

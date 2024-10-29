@@ -1,8 +1,10 @@
 package command
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,39 +16,41 @@ func TestItParsesCommand(t *testing.T) {
 		errors   bool
 	}
 
+	id := uuid.New()
+
 	tcs := []testCase{
 		{
 			name:  "parses len command",
-			input: "bongo::len",
+			input: fmt.Sprintf("%s::len", id.String()),
 			expected: Command{
-				ID:      "bongo",
+				ID:      id,
 				Keyword: Len,
 				Args:    []string{},
 			},
 		},
 		{
 			name:  "parses push command",
-			input: "bongo::push::apple",
+			input: fmt.Sprintf("%s::push::apple", id.String()),
 			expected: Command{
-				ID:      "bongo",
+				ID:      id,
 				Keyword: Push,
 				Args:    []string{"apple"},
 			},
 		},
 		{
 			name:  "parses pop command",
-			input: "bongo::pop",
+			input: fmt.Sprintf("%s::pop", id.String()),
 			expected: Command{
-				ID:      "bongo",
+				ID:      id,
 				Keyword: Pop,
 				Args:    []string{},
 			},
 		},
 		{
 			name:  "parses drain command",
-			input: "bongo::drain",
+			input: fmt.Sprintf("%s::drain", id.String()),
 			expected: Command{
-				ID:      "bongo",
+				ID:      id,
 				Keyword: Drain,
 				Args:    []string{},
 			},
@@ -69,6 +73,8 @@ func TestItParsesCommand(t *testing.T) {
 			if c.errors {
 				require.NotNil(t, err)
 				return
+			} else {
+				require.Nil(t, err)
 			}
 
 			require.Equal(t, c.expected.ID, cmd.ID)
