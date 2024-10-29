@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/orderly-queue/orderly/internal/command"
@@ -23,6 +24,8 @@ type Queue struct {
 	list *list.List
 	mu   *sync.RWMutex
 
+	pending *atomic.Int64
+
 	listenLock *sync.RWMutex
 	listeners  map[uuid.UUID]chan struct{}
 }
@@ -31,6 +34,7 @@ func New() *Queue {
 	return &Queue{
 		list:       list.New(),
 		mu:         &sync.RWMutex{},
+		pending:    &atomic.Int64{},
 		listenLock: &sync.RWMutex{},
 		listeners:  make(map[uuid.UUID]chan struct{}),
 	}
@@ -50,6 +54,7 @@ func (q *Queue) Push(item string) {
 	defer q.mu.Unlock()
 	measure(string(command.Push), func() (struct{}, error) {
 		q.list.PushBack(item)
+		q.notify()
 		return struct{}{}, nil
 	})
 }
@@ -66,6 +71,7 @@ func (q *Queue) Pop() (string, error) {
 		if !ok {
 			return "", ErrUnknown
 		}
+		q.pending.Add(-1)
 		return item, nil
 	})
 }
@@ -90,7 +96,7 @@ func (q *Queue) Consume(ctx context.Context) (<-chan string, error) {
 	go func() {
 		metrics.Consumers.Inc()
 		defer metrics.Consumers.Dec()
-		tick := time.NewTicker(time.Millisecond)
+		tick := time.NewTicker(time.Second)
 		defer tick.Stop()
 
 		for {
@@ -98,6 +104,8 @@ func (q *Queue) Consume(ctx context.Context) (<-chan string, error) {
 			case <-ctx.Done():
 				return
 			case <-tick.C:
+				q.tryPop(ctx, out)
+			case <-q.recv():
 				q.tryPop(ctx, out)
 			}
 		}
@@ -165,6 +173,7 @@ func (q *Queue) Load(data []string) {
 			q.list.PushBack(d)
 		}
 	}
+	q.pending.Swap(int64(q.list.Len()))
 }
 
 // Blocking loop that reports queue size every 500ms
@@ -177,8 +186,22 @@ func (q *Queue) Report(ctx context.Context) {
 			return
 		case <-tick.C:
 			metrics.Size.Set(float64(q.Len()))
+			metrics.Pending.Set(float64(q.pending.Load()))
 		}
 	}
+}
+
+func (q *Queue) notify() {
+	q.pending.Add(1)
+}
+
+func (q *Queue) recv() <-chan struct{} {
+	ch := make(chan struct{}, 1)
+	if q.pending.Load() > 0 {
+		ch <- struct{}{}
+		return ch
+	}
+	return make(<-chan struct{}, 1)
 }
 
 func measure[T any](method string, f func() (T, error)) (T, error) {

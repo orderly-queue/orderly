@@ -53,6 +53,8 @@ func (h *ConnectHandler) Handler() echo.HandlerFunc {
 				go h.consume(s, cmd)
 			case command.Stop:
 				h.stop(cmd)
+			default:
+				fail(s, cmd.ID, command.ErrInvalidSyntax)
 			}
 		})
 
