@@ -43,6 +43,10 @@ var (
 		Name: "orderly_queue_size",
 		Help: "The size of the queue",
 	})
+	Pending = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "orderly_pending_notifications",
+		Help: "The number of pending notifications for consumers",
+	})
 )
 
 type Metrics struct {
@@ -72,6 +76,7 @@ func New(port int) *Metrics {
 		m.Registry.MustRegister(CommandSeconds)
 		m.Registry.MustRegister(Consumers)
 		m.Registry.MustRegister(Size)
+		m.Registry.MustRegister(Pending)
 	})
 
 	m.e.GET("/metrics", echoprometheus.NewHandlerWithConfig(echoprometheus.HandlerConfig{
