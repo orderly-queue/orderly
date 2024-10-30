@@ -25,21 +25,28 @@ type Snapshotter struct {
 	bucket objstore.Bucket
 	conf   config.Snapshot
 
-	age  *snapshotAge
-	size *snapshotSize
+	age    *snapshotAge
+	size   *snapshotSize
+	latest prometheus.Gauge
 }
 
 func New(conf config.Snapshot, queue store, bucket objstore.Bucket, reg prometheus.Registerer) *Snapshotter {
 	age := newSnapshotAge()
 	size := newSnapshotSize()
+	latest := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "orderly_latest_snapshot_ages_seconds",
+		Help: "The number of seconds since the last snapshot",
+	})
 	reg.MustRegister(age)
 	reg.MustRegister(size)
+	reg.MustRegister(latest)
 	return &Snapshotter{
 		conf:   conf,
 		bucket: bucket,
 		queue:  queue,
 		age:    age,
 		size:   size,
+		latest: latest,
 	}
 }
 
@@ -62,6 +69,13 @@ func (s *Snapshotter) Work(ctx context.Context) error {
 	_, err = sched.NewJob(
 		gocron.CronJob("* * * * *", false),
 		gocron.NewTask(s.report, ctx),
+	)
+	if err != nil {
+		return err
+	}
+	_, err = sched.NewJob(
+		gocron.CronJob("* * * * *", false),
+		gocron.NewTask(s.prune, ctx),
 	)
 	if err != nil {
 		return err
@@ -93,6 +107,35 @@ func (s *Snapshotter) Snapshot(ctx context.Context) error {
 	return nil
 }
 
+func (s *Snapshotter) prune(ctx context.Context) error {
+	logger := logger.Logger(ctx)
+	logger.Debug("pruning snapshots")
+
+	snapshots, err := s.collect(ctx)
+	if err != nil {
+		logger.Errorw("failed to collect snapshots", "error", err)
+		return err
+	}
+
+	oldest := time.Now().Add(-(time.Duration(s.conf.RetentionDays) * (time.Hour * 24)))
+	deleted := 0
+	for _, sn := range snapshots {
+		if sn.Time.Before(oldest) {
+			if err := s.bucket.Delete(ctx, sn.Name); err != nil {
+				logger.Errorw("failed to delete snapshot", "snapshot", sn.Name, "error", err)
+				continue
+			}
+			deleted++
+		}
+	}
+
+	if deleted > 0 {
+		logger.Infow("pruned snapshots", "count", deleted)
+	}
+
+	return nil
+}
+
 func (s *Snapshotter) report(ctx context.Context) error {
 	logger := logger.Logger(ctx)
 	logger.Debug("collecting snapshot metrics")
@@ -106,14 +149,25 @@ func (s *Snapshotter) report(ctx context.Context) error {
 	s.age.record(snapshots)
 	s.size.record(snapshots)
 
+	latest, err := s.Latest(ctx, snapshots...)
+	if err != nil {
+		logger.Errorw("failed to get latest snapshot", "error", err)
+		return err
+	}
+
+	s.latest.Set(float64(time.Since(latest.Time).Seconds()))
+
 	return nil
 }
 
-func (s *Snapshotter) Latest(ctx context.Context) (*Snapshot, error) {
+func (s *Snapshotter) Latest(ctx context.Context, snapshots ...Snapshot) (*Snapshot, error) {
 	files := map[time.Time]Snapshot{}
-	snapshots, err := s.collect(ctx)
-	if err != nil {
-		return nil, err
+	if len(snapshots) == 0 {
+		var err error
+		snapshots, err = s.collect(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 	for _, s := range snapshots {
 		files[s.Time] = s
