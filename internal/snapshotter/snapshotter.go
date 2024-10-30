@@ -94,7 +94,7 @@ func (s *Snapshotter) Snapshot(ctx context.Context) error {
 	logger := logger.Logger(ctx)
 	logger.Infow("snapshotting queue")
 	data := s.queue.Snapshot()
-	name := fmt.Sprintf("%s.state", time.Now().Format(time.RFC3339))
+	name := s.name(time.Now())
 	by, err := json.Marshal(data)
 	if err != nil {
 		logger.Errorw("failed to marshall snapshot", "error", err)
@@ -105,6 +105,14 @@ func (s *Snapshotter) Snapshot(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Snapshotter) name(t time.Time) string {
+	name := fmt.Sprintf("%s.state", t.Format(time.RFC3339))
+	if s.conf.NamePrefix != "" {
+		name = fmt.Sprintf("%s/%s", s.conf.NamePrefix, name)
+	}
+	return name
 }
 
 func (s *Snapshotter) prune(ctx context.Context) error {
@@ -220,15 +228,21 @@ func (s Snapshot) Age() time.Duration {
 func (s *Snapshotter) collect(ctx context.Context) ([]Snapshot, error) {
 	logger := logger.Logger(ctx)
 	out := []Snapshot{}
-	if err := s.bucket.Iter(ctx, "", func(name string) error {
+
+	prefix := ""
+	if s.conf.NamePrefix != "" {
+		prefix = fmt.Sprintf("%s/", s.conf.NamePrefix)
+	}
+
+	if err := s.bucket.Iter(ctx, prefix, func(name string) error {
 		info, err := s.bucket.Attributes(ctx, name)
 		if err != nil {
 			logger.Errorw("failed to stat snapshot", "name", name, "error", err)
 			return nil
 		}
-		t, err := time.Parse(time.RFC3339, strings.ReplaceAll(name, ".state", ""))
+		t, err := s.parseTime(name)
 		if err != nil {
-			logger.Errorw("failed to parse snapshot name", "error", err)
+			logger.Errorw("failed to parse snapshot name", "name", name, "error", err)
 			return nil
 		}
 
@@ -243,4 +257,13 @@ func (s *Snapshotter) collect(ctx context.Context) ([]Snapshot, error) {
 	}
 
 	return out, nil
+}
+
+func (s *Snapshotter) parseTime(name string) (time.Time, error) {
+	name = strings.ReplaceAll(name, ".state", "")
+	if s.conf.NamePrefix != "" {
+		name = strings.TrimPrefix(name, fmt.Sprintf("%s/", s.conf.NamePrefix))
+	}
+
+	return time.Parse(time.RFC3339, name)
 }
