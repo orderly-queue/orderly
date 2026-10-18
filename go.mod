@@ -1,6 +1,6 @@
 module github.com/orderly-queue/orderly
 
-go 1.23.1
+go 1.25.0
 
 require (
 	github.com/brianvoe/gofakeit/v7 v7.1.2
@@ -14,14 +14,14 @@ require (
 	github.com/grafana/otel-profiling-go v0.5.1
 	github.com/grafana/pyroscope-go v1.2.0
 	github.com/henrywhitaker3/ctxgen v1.0.1
-	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/labstack/echo-contrib v0.17.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/olahol/melody v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/thanos-io/objstore v0.0.0-20241105144332-b598dceacb13
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.56.0
@@ -119,9 +119,9 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 // indirect
